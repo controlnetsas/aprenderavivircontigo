@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Club de Membresía | Aprender a Vivir Contigo</title>
+<meta name="description" content="Accede al Club de Membresía de Aprender a Vivir Contigo: libros descargables, artículos del blog y grabaciones de talleres para quienes ya compraron un taller o sesión.">
+<link rel="icon" type="image/png" href="assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img src="assets/img/logo.png" alt="Aprender a Vivir Contigo">
+      <span>Aprender a Vivir Contigo<small>Reconoce tu esencia</small></span>
+    </a>
+    <button class="nav-toggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main-nav">
+      <a href="index.html">Inicio</a>
+      <a href="sobre-la-marca.html">Nuestro Propósito</a>
+      <a href="talleres.html">Talleres</a>
+      <a href="descubrete.html">Reconóce TE</a>
+      <a href="mi-genealogia.html">Mi Genealogía</a>
+      <a href="terapias-grupales.html">Terapias Grupales</a>
+      <a href="agenda-te.html">Agenda TE</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="https://wa.me/573176435131" class="nav-cta" target="_blank" rel="noopener">Escríbenos</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="small-caps on-dark eyebrow-gap">Club de Membresía</span>
+    <h1>Contenido de valor para quienes ya viven el proceso</h1>
+    <p>Si ya compraste un taller o sesión con nosotros, tienes acceso a libros descargables, artículos del blog y grabaciones de talleres anteriores — un acompañamiento entre sesión y sesión.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="disclaimer" style="max-width:100%;">
+      ¿Cómo accedo? Regístrate abajo con el mismo nombre y correo con el que hiciste tu compra en la página de <a href="agenda-te.html" style="color:var(--rosa-vinculo);text-decoration:underline;">Agenda TE</a>. Te enviaremos un correo de bienvenida confirmando tu ingreso al club, y el contenido queda disponible aquí mismo.
+    </div>
+
+    <div id="membresia-gate" class="card" style="max-width:480px;margin:36px auto 0;">
+      <span class="small-caps eyebrow-gap">Ingresar al club</span>
+      <h3 class="mt-0">Regístrate con los datos de tu compra</h3>
+      <form id="form-membresia" class="formulario" novalidate>
+        <div>
+          <label for="membresia-nombre">Nombre*</label>
+          <input type="text" id="membresia-nombre" name="nombre" required>
+        </div>
+        <div>
+          <label for="membresia-correo">Correo electrónico*</label>
+          <input type="email" id="membresia-correo" name="correo" required>
+        </div>
+        <div>
+          <label for="membresia-whatsapp">WhatsApp (opcional)</label>
+          <input type="tel" id="membresia-whatsapp" name="whatsapp">
+        </div>
+        <div id="membresia-status" class="form-status" role="status"></div>
+        <button type="submit" class="btn btn-primary btn-block">Entrar al club</button>
+      </form>
+      <p style="font-size:0.78rem;color:var(--azul-noche);opacity:0.7;margin-top:14px;">
+        Si aún no has comprado ningún taller o sesión,
+        <a href="agenda-te.html" style="color:var(--rosa-vinculo);">agenda y paga aquí</a> primero.
+      </p>
+    </div>
+
+    <div id="contenido-membresia" style="display:none;margin-top:40px;">
+      <div id="lista-recursos-membresia"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-dark">
+  <div class="container text-center">
+    <span class="small-caps on-dark eyebrow-gap">¿Tienes dudas?</span>
+    <h2>Escríbenos si algo no te carga</h2>
+    <p style="max-width:60ch;margin:0 auto 24px;color:rgba(255,255,255,0.8);">Este club está en crecimiento — cada mes sumamos más contenido. Si compraste un taller y el registro no te reconoce, escríbenos y lo revisamos contigo.</p>
+    <a href="https://wa.me/573176435131?text=Hola%2C%20tengo%20una%20duda%20sobre%20el%20Club%20de%20Membres%C3%ADa" target="_blank" rel="noopener" class="btn btn-primary">Escríbenos por WhatsApp</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/img/logo.png" alt="">
+          <strong>Aprender a Vivir Contigo</strong>
+        </div>
+        <p class="footer-tagline">Reconocer para reconciliar.</p>
+        <p>Talleres de constelaciones familiares y aceptología en Colombia, inspirados en el enfoque sistémico de Bert Hellinger.</p>
+      </div>
+      <div>
+        <h4>Explora</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="sobre-la-marca.html">Nuestro Propósito</a></li>
+          <li><a href="talleres.html">Talleres</a></li>
+          <li><a href="descubrete.html">Reconóce TE</a></li>
+          <li><a href="terapias-grupales.html">Terapias Grupales</a></li>
+          <li><a href="agenda-te.html">Agenda TE</a></li>
+          <li><a href="membresia.html">Club de Membresía</a></li>
+          <li><a href="reconocete-modulo-3.html">Reconócete Módulo III</a></li>
+          <li><a href="mi-genealogia.html">Mi Genealogía</a></li>
+          <li><a href="regresando-al-vientre.html">Regresando al Vientre</a></li>
+          <li><a href="taller-genealogia.html">Taller Sanando con mi Linaje</a></li>
+          <li><a href="test-genealogia.html">Test de Genealogía</a></li>
+          <li><a href="genealogia.html">Sanando con mi Linaje (guía y test)</a></li>
+          <li><a href="hablando-contigo.html">Hablando Contigo (Blog)</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <ul class="footer-contact">
+          <li><img src="assets/img/icon-whatsapp.png" alt="">317 643 5131</li>
+          <li>talleres@aprenderavivircontigo.com</li>
+          <li>www.aprenderavivircontigo.com</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <span>© 2026 Aprender a Vivir Contigo. Todos los derechos reservados.</span>
+      <div class="social">
+        <a href="https://wa.me/573176435131" target="_blank" rel="noopener"><img src="assets/img/icon-whatsapp.png" alt="WhatsApp"></a>
+        <a href="https://www.facebook.com/aprenderavivircontigo" target="_blank" rel="noopener"><img src="assets/img/icon-facebook.png" alt="Facebook"></a>
+        <a href="https://instagram.com/aprenderavivircontigo" target="_blank" rel="noopener"><img src="assets/img/icon-instagram.png" alt="Instagram"></a>
+      </div>
+    </div>
+  </div>
+</footer>
+<a class="wa-float" href="https://wa.me/573176435131?text=Hola%2C%20tengo%20una%20duda%20sobre%20el%20Club%20de%20Membres%C3%ADa" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <img src="assets/img/icon-whatsapp.png" alt="">
+</a>
+<script src="assets/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="assets/js/registro.js"></script>
+<script src="assets/js/recursos.js"></script>
+<script src="assets/js/membresia.js"></script>
+</body>
+</html>
