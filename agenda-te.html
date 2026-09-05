@@ -73,6 +73,53 @@
   </div>
 </section>
 
+<section class="section-alt" id="membresia">
+  <div class="container">
+    <div class="section-head left" style="max-width:760px;">
+      <span class="small-caps eyebrow-gap">Club de Membresía</span>
+      <h2>Activa tu membresía</h2>
+      <p>Acceso por tiempo limitado a talleres grabados, libros descargables y descuentos. Debes <a href="login.html">iniciar sesión</a> primero.</p>
+    </div>
+    <div class="card" style="max-width:420px;">
+      <h3 class="mt-0">Membresía mensual</h3>
+      <p style="font-size:1.6rem;font-weight:700;color:var(--azul-noche);margin:4px 0 16px;">$35.000 <span style="font-size:0.9rem;font-weight:400;">COP / mes</span></p>
+      <button id="btn-pagar-membresia" class="btn btn-primary btn-block" type="button">Pagar y activar membresía</button>
+      <div id="membresia-pago-status" class="form-status" role="status" style="margin-top:10px;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="terapias">
+  <div class="container">
+    <div class="section-head left" style="max-width:760px;">
+      <span class="small-caps eyebrow-gap">Terapias virtuales</span>
+      <h2>Agenda tu cita según disponibilidad real</h2>
+      <p>Elige terapeuta, día y hora libres. Tu cupo queda reservado 10 minutos mientras completas el pago.</p>
+    </div>
+
+    <div class="card" style="max-width:560px;">
+      <div>
+        <label for="terapeuta-select">Terapeuta</label>
+        <select id="terapeuta-select" class="form-control"></select>
+      </div>
+      <div style="margin-top:14px;">
+        <label for="fecha-select">Fecha</label>
+        <input type="date" id="fecha-select">
+      </div>
+      <div style="margin-top:14px;">
+        <label>Horas disponibles</label>
+        <div id="franjas-disponibles" class="grid-2" style="margin-top:8px;"></div>
+        <p id="franjas-vacio" class="carrito-vacio" style="display:none;">No hay horas libres ese día — prueba otra fecha.</p>
+      </div>
+      <div id="cita-status" class="form-status" role="status" style="margin-top:14px;"></div>
+      <button id="btn-pagar-cita" class="btn btn-primary btn-block" type="button" disabled style="margin-top:10px;">Pagar y confirmar cita</button>
+      <p style="font-size:0.78rem;color:var(--azul-noche);opacity:0.7;margin-top:10px;">
+        Debes <a href="login.html">iniciar sesión</a> para reservar una cita.
+      </p>
+    </div>
+  </div>
+</section>
+
 <section class="section-alt">
   <div class="container">
     <div class="section-head left" style="max-width:760px;">
@@ -82,8 +129,8 @@
     <ol class="pasos" style="max-width:760px;">
       <li>Haz clic en "Ver horarios y agendar" del taller que quieres — se abre nuestro calendario real, sin riesgo de que se cruce con otra persona.</li>
       <li>Eliges el día y hora que más te convenga y confirmas tu cita ahí mismo.</li>
-      <li>Vuelves a esta página, ajustas la cantidad de cupos en ese mismo taller y pagas con Wompi.</li>
-      <li>Te escribimos por WhatsApp para confirmar todo y enviarte los detalles de acceso.</li>
+      <li>Vuelves a esta página, ajustas la cantidad de cupos en ese mismo taller y pagas.</li>
+      <li>Para terapias individuales, usa la sección "Agenda tu cita" de arriba: la franja queda reservada mientras pagas.</li>
     </ol>
   </div>
 </section>
@@ -144,5 +191,7 @@
 <script src="assets/js/main.js"></script>
 <script src="assets/js/catalogo.js"></script>
 <script src="assets/js/agenda.js"></script>
+<script src="https://checkout.epayco.co/checkout.js"></script>
+<script src="assets/js/agenda-terapias.js"></script>
 </body>
 </html>
