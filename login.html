@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingresar | Aprender a Vivir Contigo</title>
+<meta name="description" content="Inicia sesión o crea tu cuenta en Aprender a Vivir Contigo para acceder al Club de Membresía y agendar tus terapias.">
+<link rel="icon" type="image/png" href="assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img src="assets/img/logo.png" alt="Aprender a Vivir Contigo">
+      <span>Aprender a Vivir Contigo<small>Reconoce tu esencia</small></span>
+    </a>
+    <button class="nav-toggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main-nav">
+      <a href="index.html">Inicio</a>
+      <a href="sobre-la-marca.html">Nuestro Propósito</a>
+      <a href="talleres.html">Talleres</a>
+      <a href="descubrete.html">Reconóce TE</a>
+      <a href="mi-genealogia.html">Mi Genealogía</a>
+      <a href="terapias-grupales.html">Terapias Grupales</a>
+      <a href="agenda-te.html">Agenda TE</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="https://wa.me/573176435131" class="nav-cta" target="_blank" rel="noopener">Escríbenos</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="small-caps on-dark eyebrow-gap">Tu cuenta</span>
+    <h1>Ingresa o crea tu cuenta</h1>
+    <p>Con una sola cuenta accedes al Club de Membresía (si ya está activa) y puedes agendar y pagar tus terapias en línea.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="grid-2" style="max-width:920px;margin:0 auto;align-items:flex-start;">
+
+      <!-- Ingresar -->
+      <div class="card">
+        <span class="small-caps eyebrow-gap">Ya tengo cuenta</span>
+        <h3 class="mt-0">Iniciar sesión</h3>
+        <form id="form-login" class="formulario" action="login.php" method="post" novalidate>
+          <div>
+            <label for="login-correo">Correo electrónico*</label>
+            <input type="email" id="login-correo" name="correo" required>
+          </div>
+          <div>
+            <label for="login-password">Contraseña*</label>
+            <input type="password" id="login-password" name="password" required minlength="8">
+          </div>
+          <div id="login-status" class="form-status" role="status"></div>
+          <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+        </form>
+      </div>
+
+      <!-- Crear cuenta -->
+      <div class="card">
+        <span class="small-caps eyebrow-gap">Primera vez aquí</span>
+        <h3 class="mt-0">Crear mi cuenta</h3>
+        <form id="form-registro-cuenta" class="formulario" action="registro-cuenta.php" method="post" novalidate>
+          <div>
+            <label for="registro-nombre">Nombre*</label>
+            <input type="text" id="registro-nombre" name="nombre" required>
+          </div>
+          <div>
+            <label for="registro-correo">Correo electrónico*</label>
+            <input type="email" id="registro-correo" name="correo" required>
+          </div>
+          <div>
+            <label for="registro-whatsapp">WhatsApp (opcional)</label>
+            <input type="tel" id="registro-whatsapp" name="whatsapp">
+          </div>
+          <div>
+            <label for="registro-password">Crea una contraseña*</label>
+            <input type="password" id="registro-password" name="password" required minlength="8">
+          </div>
+          <!-- Campo trampa anti-spam: se deja oculto por CSS, si un bot lo llena se ignora el envío -->
+          <div style="position:absolute;left:-9999px;" aria-hidden="true">
+            <label for="sitio_web">No llenar</label>
+            <input type="text" id="sitio_web" name="sitio_web" tabindex="-1" autocomplete="off">
+          </div>
+          <div id="registro-cuenta-status" class="form-status" role="status"></div>
+          <button type="submit" class="btn btn-outline-dark btn-block">Crear mi cuenta</button>
+        </form>
+        <p style="font-size:0.78rem;color:var(--azul-noche);opacity:0.7;margin-top:14px;">
+          Crear la cuenta te suscribe a nuestro boletín. El Club de Membresía se activa automáticamente cuando compras un taller o plan de membresía.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="assets/img/logo.png" alt="">
+          <strong>Aprender a Vivir Contigo</strong>
+        </div>
+        <p class="footer-tagline">Reconocer para reconciliar.</p>
+        <p>Talleres de constelaciones familiares y aceptología en Colombia, inspirados en el enfoque sistémico de Bert Hellinger.</p>
+      </div>
+      <div>
+        <h4>Explora</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="membresia.php">Club de Membresía</a></li>
+          <li><a href="agenda-te.html">Agenda TE</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <ul class="footer-contact">
+          <li><img src="assets/img/icon-whatsapp.png" alt="">317 643 5131</li>
+          <li>talleres@aprenderavivircontigo.com</li>
+          <li>www.aprenderavivircontigo.com</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <span>© 2026 Aprender a Vivir Contigo. Todos los derechos reservados.</span>
+      <div class="social">
+        <a href="https://wa.me/573176435131" target="_blank" rel="noopener"><img src="assets/img/icon-whatsapp.png" alt="WhatsApp"></a>
+        <a href="https://www.facebook.com/aprenderavivircontigo" target="_blank" rel="noopener"><img src="assets/img/icon-facebook.png" alt="Facebook"></a>
+        <a href="https://instagram.com/aprenderavivircontigo" target="_blank" rel="noopener"><img src="assets/img/icon-instagram.png" alt="Instagram"></a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="assets/js/main.js"></script>
+<script>
+  // Muestra un mensaje de error simple si login.php / registro-cuenta.php redirige de vuelta con ?error=1
+  // (validación real de credenciales ocurre siempre en el servidor, nunca en este script).
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('error') === '1') {
+      var status = document.getElementById('login-status') || document.getElementById('registro-cuenta-status');
+      if (status) {
+        status.textContent = 'Revisa tus datos: correo/contraseña incorrectos o cuenta ya existente.';
+        status.className = 'form-status error';
+      }
+    }
+  })();
+</script>
+</body>
+</html>
