@@ -45,9 +45,12 @@
   #ruleta-modal .modal-card {
     background: var(--crema-suave); border-radius: 20px; padding: 40px 32px; text-align: center;
     max-width: 420px; box-shadow: var(--shadow-fuerte); border-top: 6px solid var(--dorado-esencia);
-    position: relative;
   }
   #ruleta-modal-texto { font-family: var(--font-titulos); font-size: 1.6rem; color: var(--azul-noche); margin: 16px 0 24px; }
+  #ruleta-paso-lista textarea {
+    width: 100%; min-height: 180px; font-family: monospace; font-size: 0.95rem;
+    padding: 14px; border-radius: 10px; border: 1px solid rgba(33,26,51,0.2); resize: vertical;
+  }
 </style>
 </head>
 <body>
@@ -73,52 +76,48 @@
   <div class="container text-center">
     <span class="small-caps on-dark eyebrow-gap">Sorteo en vivo</span>
     <h1>Ruleta — 2 cupos para Sanando con mi Linaje</h1>
-    <p style="max-width:60ch;margin:0 auto;">Cada semana se carga una lista nueva de participantes. Gira la ruleta dos veces para elegir, sin repetir, los dos cupos de constelación familiar de esta sesión.</p>
+    <p style="max-width:60ch;margin:0 auto;">Pega tu lista de esta semana (copiada directo de Excel) y gira la ruleta dos veces para elegir, sin repetir, los dos cupos de constelación familiar.</p>
   </div>
 </section>
 
 <section>
-  <div class="container text-center">
-
-    <div id="ruleta-status" class="form-status" role="status" style="max-width:480px;margin:0 auto;"></div>
-
-    <div class="ruleta-contenedor">
-      <div class="ruleta-puntero"></div>
-      <div id="ruleta-wrap">
-        <canvas id="ruleta-canvas" width="420" height="420"></canvas>
-      </div>
-      <div class="ruleta-mandala-centro">
-        <img src="assets/img/mandala.png" alt="">
-      </div>
-    </div>
-
-    <div style="margin:24px 0;">
-      <button id="btn-girar-ruleta" class="btn btn-primary" type="button" style="margin-right:10px;">Girar la ruleta</button>
-      <button id="btn-recargar-ruleta" class="btn btn-outline-dark" type="button" style="margin-right:10px;">Recargar lista de esta semana</button>
-      <button id="btn-reiniciar-ruleta" class="btn btn-outline-dark" type="button">Reiniciar sorteo</button>
-    </div>
-
-    <div class="section-head left" style="max-width:480px;margin:40px auto 0;">
-      <span class="small-caps eyebrow-gap">Resultado</span>
-      <h2>Ganadores de esta semana</h2>
-    </div>
-    <div id="ruleta-ganadores" style="max-width:480px;margin:16px auto 0;"></div>
-
-  </div>
-</section>
-
-<section class="section-alt">
   <div class="container">
-    <div class="card" style="max-width:680px;margin:0 auto;">
-      <h3 class="mt-0">Cómo actualizar la lista cada semana</h3>
-      <ol class="pasos">
-        <li>En Excel, deja tu lista con dos columnas: <strong>nombre</strong> y <strong>whatsapp</strong> (la segunda es opcional).</li>
-        <li>Archivo → Guardar como → elige el formato <strong>CSV (delimitado por comas)</strong>.</li>
-        <li>Nombra el archivo exactamente <code>participantes-ruleta.csv</code>.</li>
-        <li>En hPanel → Administrador de archivos, entra a la carpeta raíz de tu sitio y sube ese archivo, reemplazando el anterior (acepta "Reemplazar").</li>
-        <li>Vuelve a esta página y haz clic en "Recargar lista de esta semana" — no necesitas hacer nada en GitHub para esto.</li>
-      </ol>
+
+    <!-- PASO 1: pegar la lista -->
+    <div id="ruleta-paso-lista" class="card" style="max-width:640px;margin:0 auto;">
+      <span class="small-caps eyebrow-gap">Paso 1</span>
+      <h3 class="mt-0">Pega tu lista de participantes</h3>
+      <p style="font-size:0.9rem;">En Excel, selecciona la columna de nombres (y opcionalmente la de WhatsApp al lado) y cópiala (Ctrl+C). Pégala aquí abajo (Ctrl+V) — un participante por línea. Si copiaste dos columnas, funciona igual.</p>
+      <textarea id="ruleta-textarea" placeholder="María José Restrepo&#10;Andrés Felipe Gómez&#10;Laura Camila Torres&#10;..."></textarea>
+      <div id="ruleta-lista-status" class="form-status" role="status" style="margin-top:10px;"></div>
+      <button id="btn-cargar-lista" class="btn btn-primary btn-block" type="button" style="margin-top:14px;">Cargar lista y preparar ruleta</button>
     </div>
+
+    <!-- PASO 2: la ruleta -->
+    <div id="ruleta-paso-rueda" style="display:none;text-align:center;">
+      <div class="ruleta-contenedor">
+        <div class="ruleta-puntero"></div>
+        <div id="ruleta-wrap">
+          <canvas id="ruleta-canvas" width="420" height="420"></canvas>
+        </div>
+        <div class="ruleta-mandala-centro">
+          <img src="assets/img/mandala.png" alt="">
+        </div>
+      </div>
+
+      <div style="margin:24px 0;">
+        <button id="btn-girar-ruleta" class="btn btn-primary" type="button" style="margin-right:10px;">Girar la ruleta</button>
+        <button id="btn-reiniciar-ruleta" class="btn btn-outline-dark" type="button" style="margin-right:10px;">Reiniciar sorteo</button>
+        <button id="btn-nueva-lista" class="btn btn-outline-dark" type="button">Pegar otra lista</button>
+      </div>
+
+      <div class="section-head left" style="max-width:480px;margin:40px auto 0;">
+        <span class="small-caps eyebrow-gap">Resultado</span>
+        <h2>Ganadores de esta semana</h2>
+      </div>
+      <div id="ruleta-ganadores" style="max-width:480px;margin:16px auto 0;"></div>
+    </div>
+
   </div>
 </section>
 
@@ -132,6 +131,201 @@
 </div>
 
 <script src="assets/js/main.js"></script>
-<script src="assets/js/ruleta.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var COLORES = ['#211A33', '#C2607D', '#F5C343']; // azul noche, rosa vínculo, dorado esencia
+  var CUPOS_A_SORTEAR = 2;
+
+  var canvas, ctx, ruletaWrap;
+  var participantes = [];
+  var enJuego = [];
+  var ganadores = [];
+  var rotacionActual = 0;
+  var girando = false;
+
+  // Acepta líneas separadas por salto de línea; dentro de cada línea, separa por
+  // tabulación (pegado de 2 columnas de Excel) o por coma, para tomar nombre y whatsapp.
+  function parseTexto(texto) {
+    return texto.split(/\r?\n/)
+      .map(function (linea) { return linea.trim(); })
+      .filter(function (linea) { return linea.length > 0; })
+      .map(function (linea) {
+        var partes = linea.split(/\t|,/);
+        return { nombre: (partes[0] || '').trim(), whatsapp: (partes[1] || '').trim() };
+      })
+      .filter(function (p) { return p.nombre; });
+  }
+
+  function dibujarRueda() {
+    if (!canvas || !ctx) return;
+    var n = enJuego.length;
+    var cx = canvas.width / 2;
+    var cy = canvas.height / 2;
+    var radio = canvas.width / 2 - 6;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (n === 0) {
+      ctx.fillStyle = '#211A33';
+      ctx.font = '600 18px Poppins, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Sin participantes', cx, cy);
+      return;
+    }
+
+    var sliceAngle = (2 * Math.PI) / n;
+
+    for (var i = 0; i < n; i++) {
+      var inicio = i * sliceAngle;
+      var fin = inicio + sliceAngle;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radio, inicio, fin);
+      ctx.closePath();
+      ctx.fillStyle = COLORES[i % COLORES.length];
+      ctx.fill();
+      ctx.strokeStyle = '#FDF9F2';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(inicio + sliceAngle / 2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#FDF9F2';
+      ctx.font = '600 ' + Math.max(11, Math.min(16, 220 / n)) + 'px Poppins, sans-serif';
+      var nombreCorto = enJuego[i].nombre.length > 22 ? enJuego[i].nombre.slice(0, 20) + '…' : enJuego[i].nombre;
+      ctx.fillText(nombreCorto, radio - 14, 5);
+      ctx.restore();
+    }
+  }
+
+  function girar() {
+    if (girando || enJuego.length === 0 || ganadores.length >= CUPOS_A_SORTEAR) return;
+
+    girando = true;
+    var btnGirar = document.getElementById('btn-girar-ruleta');
+    if (btnGirar) btnGirar.disabled = true;
+
+    var n = enJuego.length;
+    var sliceAngleDeg = 360 / n;
+    var vueltasExtra = 6 + Math.floor(Math.random() * 3);
+    var offsetAleatorio = Math.random() * 360;
+    var nuevaRotacion = rotacionActual + vueltasExtra * 360 + offsetAleatorio;
+
+    ruletaWrap.style.transition = 'transform 4.5s cubic-bezier(0.17, 0.67, 0.16, 0.99)';
+    ruletaWrap.style.transform = 'rotate(' + nuevaRotacion + 'deg)';
+    rotacionActual = nuevaRotacion;
+
+    setTimeout(function () {
+      var efectiva = (360 - (rotacionActual % 360)) % 360;
+      var indiceGanador = Math.floor(efectiva / sliceAngleDeg) % n;
+      var ganador = enJuego[indiceGanador];
+
+      ganadores.push(ganador);
+      enJuego.splice(indiceGanador, 1);
+
+      renderGanadores();
+      mostrarGanadorModal(ganador);
+
+      ruletaWrap.style.transition = 'none';
+      rotacionActual = rotacionActual % 360;
+      ruletaWrap.style.transform = 'rotate(' + rotacionActual + 'deg)';
+      dibujarRueda();
+
+      girando = false;
+      if (btnGirar) {
+        if (ganadores.length >= CUPOS_A_SORTEAR || enJuego.length === 0) {
+          btnGirar.disabled = true;
+          btnGirar.textContent = 'Sorteo completo';
+        } else {
+          btnGirar.disabled = false;
+          btnGirar.textContent = 'Girar por el segundo cupo';
+        }
+      }
+    }, 4600);
+  }
+
+  function renderGanadores() {
+    var cont = document.getElementById('ruleta-ganadores');
+    if (!cont) return;
+    if (ganadores.length === 0) {
+      cont.innerHTML = '<p class="carrito-vacio">Aún no hay ganadores.</p>';
+      return;
+    }
+    cont.innerHTML = ganadores.map(function (g, i) {
+      return '<div class="card" style="margin-bottom:12px;"><span class="small-caps eyebrow-gap">Cupo ' + (i + 1) + '</span><h3 class="mt-0">' + g.nombre + '</h3>' +
+        (g.whatsapp ? '<p style="margin:0;">WhatsApp: ' + g.whatsapp + '</p>' : '') + '</div>';
+    }).join('');
+  }
+
+  function mostrarGanadorModal(g) {
+    var modal = document.getElementById('ruleta-modal');
+    var texto = document.getElementById('ruleta-modal-texto');
+    if (!modal || !texto) return;
+    texto.textContent = '🎉 ' + g.nombre;
+    modal.style.display = 'flex';
+  }
+
+  function reiniciar() {
+    if (girando) return;
+    enJuego = participantes.slice();
+    ganadores = [];
+    rotacionActual = 0;
+    ruletaWrap.style.transition = 'none';
+    ruletaWrap.style.transform = 'rotate(0deg)';
+    var btnGirar = document.getElementById('btn-girar-ruleta');
+    if (btnGirar) { btnGirar.disabled = false; btnGirar.textContent = 'Girar la ruleta'; }
+    renderGanadores();
+    dibujarRueda();
+  }
+
+  function cargarLista() {
+    var textarea = document.getElementById('ruleta-textarea');
+    var status = document.getElementById('ruleta-lista-status');
+    var lista = parseTexto(textarea.value);
+
+    if (lista.length < 2) {
+      status.textContent = 'Pega al menos 2 participantes antes de continuar.';
+      status.className = 'form-status error';
+      return;
+    }
+
+    participantes = lista;
+    enJuego = participantes.slice();
+    ganadores = [];
+    rotacionActual = 0;
+
+    document.getElementById('ruleta-paso-lista').style.display = 'none';
+    document.getElementById('ruleta-paso-rueda').style.display = '';
+
+    renderGanadores();
+    dibujarRueda();
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    canvas = document.getElementById('ruleta-canvas');
+    ruletaWrap = document.getElementById('ruleta-wrap');
+    ctx = canvas.getContext('2d');
+
+    document.getElementById('btn-cargar-lista').addEventListener('click', cargarLista);
+    document.getElementById('btn-girar-ruleta').addEventListener('click', girar);
+    document.getElementById('btn-reiniciar-ruleta').addEventListener('click', reiniciar);
+    document.getElementById('btn-cerrar-ruleta-modal').addEventListener('click', function () {
+      document.getElementById('ruleta-modal').style.display = 'none';
+    });
+    document.getElementById('btn-nueva-lista').addEventListener('click', function () {
+      if (girando) return;
+      document.getElementById('ruleta-paso-rueda').style.display = 'none';
+      document.getElementById('ruleta-paso-lista').style.display = '';
+      document.getElementById('ruleta-textarea').value = '';
+      document.getElementById('ruleta-lista-status').textContent = '';
+    });
+  });
+})();
+</script>
 </body>
 </html>
