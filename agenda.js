@@ -46,7 +46,7 @@
       return (
         '<div class="producto-agenda-card">' +
           '<div class="producto-agenda-head">' +
-            '<span class="icono-taller" aria-hidden="true">' + (p.icono || '✨') + '</span>' +
+            '<a href="registrate.html" aria-label="Regístrate"><span class="icono-taller">' + (p.icono || '✨') + '</span></a>' +
             '<div>' +
               '<h4>' + p.nombre + '</h4>' +
               '<span class="producto-detalle-linea">' + p.detalle + '</span>' +
