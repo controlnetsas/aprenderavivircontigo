@@ -144,17 +144,22 @@
 </footer>
 <script src="assets/js/main.js"></script>
 <script>
-  // Muestra un mensaje de error simple si login.php / registro-cuenta.php redirige de vuelta con ?error=1
-  // (validación real de credenciales ocurre siempre en el servidor, nunca en este script).
   (function () {
     var params = new URLSearchParams(window.location.search);
-    if (params.get('error') === '1') {
-      var status = document.getElementById('login-status') || document.getElementById('registro-cuenta-status');
-      if (status) {
-        status.textContent = 'Revisa tus datos: correo/contraseña incorrectos o cuenta ya existente.';
-        status.className = 'form-status error';
-      }
-    }
+    var error = params.get('error');
+    if (!error) return;
+
+    var status = document.getElementById('login-status') || document.getElementById('registro-cuenta-status');
+    if (!status) return;
+
+    var mensajes = {
+      'no-verificado': 'Tu correo aún no está confirmado. Revisa tu bandeja de entrada (o spam) y haz clic en el enlace que te enviamos.',
+      'token-invalido': 'Ese enlace de confirmación ya no es válido o ya fue usado. Si tu cuenta ya está activa, inicia sesión normalmente.',
+      'correo-existente': 'Ya existe una cuenta con ese correo. Inicia sesión aquí, o usa "¿Olvidaste tu contraseña?" si no la recuerdas.'
+    };
+
+    status.textContent = mensajes[error] || 'Revisa tus datos: correo/contraseña incorrectos.';
+    status.className = 'form-status error';
   })();
 </script>
 </body>

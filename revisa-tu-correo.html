@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revisa tu correo | Aprender a Vivir Contigo</title>
+<link rel="icon" type="image/png" href="assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img src="assets/img/logo.png" alt="Aprender a Vivir Contigo">
+      <span>Aprender a Vivir Contigo<small>Reconoce tu esencia</small></span>
+    </a>
+    <button class="nav-toggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main-nav">
+      <a href="index.html">Inicio</a>
+      <a href="talleres.html">Talleres</a>
+      <a href="agenda-te.html">Agenda TE</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container text-center">
+    <span class="small-caps on-dark eyebrow-gap">Un último paso</span>
+    <h1>Revisa tu correo</h1>
+    <p id="mensaje-correo" style="max-width:60ch;margin:0 auto;">Te enviamos un enlace de confirmación. Haz clic en él para activar tu cuenta.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container text-center">
+    <div class="card" style="max-width:480px;margin:0 auto;">
+      <span class="small-caps eyebrow-gap">¿No te llegó?</span>
+      <h3 class="mt-0">Revisa spam o correo no deseado</h3>
+      <p>A veces el primer correo cae ahí. Si después de unos minutos sigue sin aparecer, escríbenos y te ayudamos a activar tu cuenta manualmente.</p>
+      <a href="https://wa.me/573176435131?text=Hola%2C%20no%20me%20lleg%C3%B3%20el%20correo%20de%20confirmaci%C3%B3n%20de%20mi%20cuenta" target="_blank" rel="noopener" class="btn btn-primary btn-block">Escríbenos por WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bar">
+      <span>© 2026 Aprender a Vivir Contigo. Todos los derechos reservados.</span>
+    </div>
+  </div>
+</footer>
+<script src="assets/js/main.js"></script>
+<script>
+  var params = new URLSearchParams(window.location.search);
+  var correo = params.get('correo');
+  if (correo) {
+    document.getElementById('mensaje-correo').textContent =
+      'Te enviamos un enlace de confirmación a ' + correo + '. Haz clic en él para activar tu cuenta.';
+  }
+</script>
+</body>
+</html>

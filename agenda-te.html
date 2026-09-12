@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agenda tu cita y paga en línea | Aprender a Vivir Contigo</title>
-<meta name="description" content="Elige el horario disponible en el calendario de Aprender a Vivir Contigo y paga tu taller o sesión en línea.">
+<title>Agenda TE | Aprender a Vivir Contigo</title>
+<meta name="description" content="Agenda talleres, activa tu membresía o reserva tu terapia virtual con Aprender a Vivir Contigo. Coordinamos el pago contigo por WhatsApp.">
 <link rel="icon" type="image/png" href="assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,15 +38,30 @@
 <section class="page-hero">
   <div class="container">
     <span class="small-caps on-dark eyebrow-gap">Agenda TE</span>
-    <h1>Elige tu horario y reserva tu cupo</h1>
-    <p>Cada taller o sesión se agenda directo en nuestro calendario real, así que ves la disponibilidad actualizada. Después de agendar, confirma tu cupo pagando en línea aquí mismo.</p>
+    <h1>Talleres, membresía y terapia — todo en un solo lugar</h1>
+    <p>Elige lo que necesitas: inscríbete a un taller, activa tu membresía para acceder al contenido de valor, o agenda tu terapia virtual según disponibilidad real. Confirmamos y coordinamos el pago contigo por WhatsApp.</p>
   </div>
 </section>
 
-<section>
+<section style="padding-top:0;">
   <div class="container">
+    <div class="tabs-navegacion" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+      <a href="#talleres" class="btn btn-outline-dark">Talleres</a>
+      <a href="#membresia" class="btn btn-outline-dark">Club de Membresía</a>
+      <a href="#terapias" class="btn btn-outline-dark">Terapia virtual</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TALLERES ===================== -->
+<section id="talleres">
+  <div class="container">
+    <div class="section-head left" style="max-width:760px;">
+      <span class="small-caps eyebrow-gap">Talleres y sesiones</span>
+      <h2>Agenda tu horario y confirma con el pago</h2>
+    </div>
     <div class="disclaimer" style="max-width:100%;">
-      Paso 1: haz clic en "Ver horarios y agendar" del taller que te interesa — se abre nuestro calendario para que elijas el día y hora que prefieras. Paso 2: vuelve aquí, ajusta la cantidad de cupos en el mismo taller y paga con el botón de abajo para confirmar tu reserva.
+      Paso 1: haz clic en "Ver horarios y agendar" del taller que te interesa. Paso 2: vuelve aquí, ajusta la cantidad de cupos y paga con el botón de abajo para confirmar tu reserva.
     </div>
 
     <div class="grid-2 grid-2-carrito" style="margin-top:36px;">
@@ -62,13 +77,66 @@
           <span>Total</span>
           <span id="carrito-total">$0 COP</span>
         </div>
-        <button id="btn-pagar" class="btn btn-primary btn-block" type="button" disabled>Pagar con Wompi</button>
-        <div id="wompi-widget-contenedor"></div>
+        <button id="btn-pagar-taller" class="btn btn-primary btn-block" type="button" disabled>Confirmar por WhatsApp</button>
+        <div id="epayco-taller-status" class="form-status" role="status"></div>
         <p style="font-size:0.8rem;color:rgba(255,255,255,0.65);margin-top:16px;">
-          Pago seguro procesado por Wompi (tarjeta, PSE o Nequi). Si prefieres coordinar el pago manualmente,
-          <a href="https://wa.me/573176435131" target="_blank" rel="noopener" style="color:var(--dorado-esencia);text-decoration:underline;">escríbenos por WhatsApp</a>.
+          Al hacer clic te llevamos a WhatsApp con el resumen de tu reserva, para coordinar el pago por Nequi, Bre-B o efectivo.
         </p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MEMBRESÍA ===================== -->
+<section class="section-alt" id="membresia">
+  <div class="container">
+    <div class="section-head left" style="max-width:760px;">
+      <span class="small-caps eyebrow-gap">Club de Membresía</span>
+      <h2>Activa tu membresía</h2>
+      <p>Acceso por tiempo limitado a talleres grabados, libros descargables y descuentos exclusivos. Debes <a href="login.html">iniciar sesión</a> primero.</p>
+    </div>
+    <div class="card" style="max-width:420px;">
+      <h3 class="mt-0">Membresía mensual</h3>
+      <p style="font-size:1.6rem;font-weight:700;color:var(--azul-noche);margin:4px 0 16px;">$35.000 <span style="font-size:0.9rem;font-weight:400;">COP / mes</span></p>
+      <ul style="margin:0 0 18px;padding-left:20px;color:var(--azul-noche);">
+        <li>Grabaciones de talleres pasados</li>
+        <li>Libros y guías descargables</li>
+        <li>Descuentos en próximos talleres</li>
+      </ul>
+      <button id="btn-pagar-membresia" class="btn btn-primary btn-block" type="button">Solicitar membresía por WhatsApp</button>
+      <div id="epayco-membresia-status" class="form-status" role="status" style="margin-top:10px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TERAPIA VIRTUAL ===================== -->
+<section id="terapias">
+  <div class="container">
+    <div class="section-head left" style="max-width:760px;">
+      <span class="small-caps eyebrow-gap">Terapia virtual</span>
+      <h2>Agenda tu cita según disponibilidad real</h2>
+      <p>Elige día y hora libres. Tu cupo queda reservado 10 minutos mientras confirmas el pago por WhatsApp.</p>
+    </div>
+
+    <div class="card" style="max-width:560px;">
+      <div>
+        <label for="terapeuta-select">Terapeuta</label>
+        <select id="terapeuta-select" class="form-control"></select>
+      </div>
+      <div style="margin-top:14px;">
+        <label for="fecha-select">Fecha</label>
+        <input type="date" id="fecha-select">
+      </div>
+      <div style="margin-top:14px;">
+        <label>Horas disponibles</label>
+        <div id="franjas-disponibles" class="grid-2" style="margin-top:8px;"></div>
+        <p id="franjas-vacio" class="carrito-vacio" style="display:none;">No hay horas libres ese día — prueba otra fecha.</p>
+      </div>
+      <div id="cita-status" class="form-status" role="status" style="margin-top:14px;"></div>
+      <button id="btn-pagar-cita" class="btn btn-primary btn-block" type="button" disabled style="margin-top:10px;">Reservar y confirmar por WhatsApp</button>
+      <p style="font-size:0.78rem;color:var(--azul-noche);opacity:0.7;margin-top:10px;">
+        Debes <a href="login.html">iniciar sesión</a> para reservar una cita.
+      </p>
     </div>
   </div>
 </section>
@@ -77,13 +145,13 @@
   <div class="container">
     <div class="section-head left" style="max-width:760px;">
       <span class="small-caps eyebrow-gap">¿Cómo funciona?</span>
-      <h2>Agendar y pagar en 4 pasos</h2>
+      <h2>Todo en pocos pasos</h2>
     </div>
     <ol class="pasos" style="max-width:760px;">
-      <li>Haz clic en "Ver horarios y agendar" del taller que quieres — se abre nuestro calendario real, sin riesgo de que se cruce con otra persona.</li>
-      <li>Eliges el día y hora que más te convenga y confirmas tu cita ahí mismo.</li>
-      <li>Vuelves a esta página, ajustas la cantidad de cupos en ese mismo taller y pagas con Wompi.</li>
-      <li>Te escribimos por WhatsApp para confirmar todo y enviarte los detalles de acceso.</li>
+      <li><strong>Talleres:</strong> agenda tu horario en el calendario del taller, vuelve aquí, ajusta cupos y paga.</li>
+      <li><strong>Membresía:</strong> inicia sesión, elige el plan y paga — se activa automáticamente por un mes.</li>
+      <li><strong>Terapia virtual:</strong> inicia sesión, elige terapeuta, fecha y hora libre, y confirma con el pago (tu cupo queda apartado 10 minutos).</li>
+      <li>El pago se coordina directamente por WhatsApp — Nequi, Bre-B o efectivo.</li>
     </ol>
   </div>
 </section>
@@ -108,7 +176,8 @@
           <li><a href="descubrete.html">Reconóce TE</a></li>
           <li><a href="terapias-grupales.html">Terapias Grupales</a></li>
           <li><a href="agenda-te.html">Agenda TE</a></li>
-          <li><a href="membresia.html">Club de Membresía</a></li>
+          <li><a href="membresia.php">Club de Membresía</a></li>
+          <li><a href="login.html">Ingresar / Crear cuenta</a></li>
           <li><a href="reconocete-modulo-3.html">Reconócete Módulo III</a></li>
           <li><a href="mi-genealogia.html">Mi Genealogía</a></li>
           <li><a href="regresando-al-vientre.html">Regresando al Vientre</a></li>
@@ -141,6 +210,7 @@
 <a class="wa-float" href="https://wa.me/573176435131?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20los%20talleres%20de%20Aprender%20a%20Vivir%20Contigo" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
   <img src="assets/img/icon-whatsapp.png" alt="">
 </a>
+
 <script src="assets/js/main.js"></script>
 <script src="assets/js/catalogo.js"></script>
 <script src="assets/js/agenda.js"></script>
