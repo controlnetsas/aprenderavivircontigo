@@ -19,7 +19,16 @@ if ($esMiembro) {
   $contenido = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$ETIQUETAS_TIPO = ['libro' => 'Libros y guías descargables', 'blog' => 'Artículos del blog', 'taller' => 'Grabaciones de talleres', 'descuento' => 'Descuentos activos'];
+$ETIQUETAS_TIPO = [
+  'meditacion'  => 'Meditaciones guiadas',
+  'respiracion' => 'Métodos de respiración',
+  'receta'      => 'Recetas',
+  'rutina'      => 'Rutinas de alimentación',
+  'libro'       => 'Libros y guías descargables',
+  'blog'        => 'Artículos del blog',
+  'taller'      => 'Grabaciones de talleres',
+  'descuento'   => 'Descuentos activos',
+];
 $agrupado = [];
 foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
 ?>
@@ -32,6 +41,8 @@ foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
 <meta name="description" content="Accede al Club de Membresía de Aprender a Vivir Contigo: libros descargables, artículos del blog, descuentos y grabaciones de talleres por tiempo limitado.">
 <link rel="icon" type="image/png" href="assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#211A33">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -101,6 +112,10 @@ foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
         Tu membresía está activa<?= $usuario['fecha_vencimiento'] ? ' hasta el ' . date('d/m/Y', strtotime($usuario['fecha_vencimiento'])) : '' ?>. Este contenido puede cambiar por tiempo limitado — vuelve seguido.
       </div>
 
+      <div class="text-center" style="margin-top:20px;">
+        <button id="btn-instalar-app" class="btn btn-outline-dark" type="button" style="display:none;">📲 Instalar como app en tu celular</button>
+      </div>
+
       <div style="margin-top:32px;">
         <?php if (empty($contenido)): ?>
           <p>Muy pronto agregaremos aquí el contenido del club.</p>
@@ -109,12 +124,18 @@ foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
             <div style="margin-bottom:32px;">
               <span class="small-caps eyebrow-gap"><?= htmlspecialchars($titulo) ?></span>
               <div class="grid-2" style="margin-top:14px;">
+                <?php
+                  $ETIQUETAS_BOTON = ['meditacion' => 'Reproducir', 'respiracion' => 'Reproducir', 'receta' => 'Ver receta', 'rutina' => 'Ver rutina', 'libro' => 'Descargar / Ver'];
+                ?>
                 <?php foreach ($agrupado[$tipo] as $item): ?>
                   <div class="card" style="margin-bottom:18px;">
                     <h4 class="mt-0"><?= htmlspecialchars($item['titulo']) ?></h4>
+                    <?php if (!empty($item['duracion_min'])): ?>
+                      <p style="font-size:0.8rem;color:var(--rosa-vinculo);margin:-6px 0 8px;">⏱ <?= (int)$item['duracion_min'] ?> min</p>
+                    <?php endif; ?>
                     <p><?= htmlspecialchars($item['descripcion']) ?></p>
                     <?php if ($item['url_archivo']): ?>
-                      <a class="btn btn-primary btn-block" href="<?= htmlspecialchars($item['url_archivo']) ?>" target="_blank" rel="noopener">Descargar / Ver</a>
+                      <a class="btn btn-primary btn-block" href="<?= htmlspecialchars($item['url_archivo']) ?>" target="_blank" rel="noopener"><?= $ETIQUETAS_BOTON[$tipo] ?? 'Abrir' ?></a>
                     <?php else: ?>
                       <span class="btn btn-outline-dark btn-block" style="opacity:0.6;pointer-events:none;">Próximamente</span>
                     <?php endif; ?>

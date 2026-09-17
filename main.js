@@ -1,4 +1,36 @@
 // Aprender a Vivir Contigo — comportamiento común del sitio
+
+// Registro del Service Worker (habilita instalar el sitio como app — PWA).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function (err) {
+      console.warn('No se pudo registrar el service worker:', err);
+    });
+  });
+}
+
+// Botón "Instalar app" — aparece solo cuando el navegador confirma que se puede instalar
+// (principalmente Chrome/Android; iOS/Safari no dispara este evento, ahí se instala
+// manualmente desde "Compartir → Añadir a pantalla de inicio").
+var eventoInstalacion = null;
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  eventoInstalacion = e;
+  var btn = document.getElementById('btn-instalar-app');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  var btnInstalar = document.getElementById('btn-instalar-app');
+  if (btnInstalar) {
+    btnInstalar.addEventListener('click', function () {
+      if (!eventoInstalacion) return;
+      eventoInstalacion.prompt();
+      eventoInstalacion.userChoice.then(function () { eventoInstalacion = null; });
+    });
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function () {
   var toggle = document.querySelector('.nav-toggle');
   var nav = document.querySelector('.main-nav');
