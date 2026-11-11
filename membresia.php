@@ -78,6 +78,12 @@ foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
     <p>Talleres, libros y descuentos disponibles por tiempo limitado mientras tu membresía esté activa.</p>
   </div>
 </section>
+<div class="container" style="padding:18px 0;text-align:center;">
+  <a class="btn btn-outline-dark" href="/mi-camino.php">Mi camino · ejercicios y talleres</a>
+  <?php if (!empty($usuario) && ($usuario['rol'] ?? '') === 'terapeuta'): ?>
+    <a class="btn btn-primary" href="/terapeuta.php">Panel del terapeuta</a>
+  <?php endif; ?>
+</div>
 
 <section>
   <div class="container">

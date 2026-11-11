@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 function usuarioActual() {
   if (empty($_SESSION['usuario_id'])) return null;
   $stmt = conexionDB()->prepare(
-    "SELECT id, nombre, email, estado_membresia, fecha_vencimiento FROM usuarios WHERE id = ?"
+    "SELECT id, nombre, email, estado_membresia, fecha_vencimiento, rol FROM usuarios WHERE id = ?"
   );
   $stmt->execute([$_SESSION['usuario_id']]);
   return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
@@ -34,4 +34,29 @@ function esMiembroActivo($usuario) {
   return $usuario
     && $usuario['estado_membresia'] === 'activa'
     && (!$usuario['fecha_vencimiento'] || strtotime($usuario['fecha_vencimiento']) >= time());
+}
+
+// Solo el terapeuta entra a su panel; cualquier otro usuario vuelve a la membresía.
+function requiereTerapeuta() {
+  requiereLogin();
+  $u = usuarioActual();
+  if (!$u || ($u['rol'] ?? '') !== 'terapeuta') {
+    header('Location: /membresia.php');
+    exit;
+  }
+  return $u;
+}
+
+// Token CSRF para formularios y llamadas POST de usuarios con sesión.
+function tokenCsrf() {
+  if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(24));
+  return $_SESSION['csrf'];
+}
+
+function verificaCsrf() {
+  $enviado = $_POST['csrf'] ?? ($_SERVER['HTTP_X_CSRF'] ?? '');
+  if (empty($_SESSION['csrf']) || !is_string($enviado) || !hash_equals($_SESSION['csrf'], $enviado)) {
+    http_response_code(403);
+    exit('Sesión expirada. Recarga la página e intenta de nuevo.');
+  }
 }
