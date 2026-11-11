@@ -130,7 +130,39 @@
   </div>
 </footer>
 <script src="assets/js/main.js"></script>
-<script src="assets/js/password.js"></script>
+<script>
+(function () {
+  var st = document.createElement('style');
+  st.textContent = '.pw-wrap{position:relative;display:block}.pw-wrap input{padding-right:46px!important}.pw-ojo{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;padding:8px;font-size:18px;line-height:1;opacity:.7}.pw-ojo:hover{opacity:1}';
+  document.head.appendChild(st);
+  document.querySelectorAll('input[type="password"]').forEach(function (input) {
+    var wrap = document.createElement('span');
+    wrap.className = 'pw-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pw-ojo'; b.textContent = '👁';
+    b.setAttribute('aria-label', 'Mostrar contraseña');
+    b.addEventListener('click', function () {
+      var ver = input.type === 'password';
+      input.type = ver ? 'text' : 'password';
+      b.textContent = ver ? '🙈' : '👁';
+    });
+    wrap.appendChild(b);
+  });
+  var f = document.getElementById('form-registro-cuenta');
+  var p1 = document.getElementById('registro-password'), p2 = document.getElementById('registro-password2');
+  f.addEventListener('submit', function (e) {
+    if (p1.value !== p2.value) {
+      e.preventDefault();
+      var s = document.getElementById('registro-cuenta-status');
+      s.textContent = 'Las contraseñas no coinciden. Vuelve a escribirlas.';
+      s.className = 'form-status error';
+      p2.focus();
+    }
+  });
+})();
+</script>
 <script>
   (function () {
     var params = new URLSearchParams(window.location.search);
