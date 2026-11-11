@@ -44,6 +44,7 @@ if ($cuentaExistente) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $nombre = trim($_POST['nombre'] ?? '');
   $password = $_POST['password'] ?? '';
+  $password2 = $_POST['password2'] ?? '';
   $acepta = !empty($_POST['consentimiento']);
 
   if (!empty($_POST['sitio_web'] ?? '')) exit; // campo trampa
@@ -51,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error = 'Escribe tu nombre completo.';
   } elseif (strlen($password) < 8) {
     $error = 'La contraseña debe tener al menos 8 caracteres.';
+  } elseif ($password !== $password2) {
+    $error = 'Las contraseñas no coinciden.';
   } elseif (!$acepta) {
     $error = 'Para activar tu camino necesitas aceptar el uso de tus datos.';
   } else {
@@ -113,6 +116,8 @@ paginaInicio('Activa tu camino');
     <input class="campo" value="<?= h(ocultarCorreo($consulta['email'])) ?>" disabled>
     <label class="etq" for="password">Crea una contraseña (mínimo 8 caracteres)</label>
     <input class="campo" id="password" name="password" type="password" minlength="8" required autocomplete="new-password">
+    <label class="etq" for="password2">Confirma tu contraseña</label>
+    <input class="campo" id="password2" name="password2" type="password" minlength="8" required autocomplete="new-password">
     <label style="display:flex;gap:10px;margin:18px 0;align-items:flex-start">
       <input type="checkbox" name="consentimiento" value="1" required style="margin-top:4px">
       <span class="mut"><?= h(TEXTO_CONSENTIMIENTO) ?></span>
@@ -121,4 +126,5 @@ paginaInicio('Activa tu camino');
   </form>
 </div>
 <p class="mut" style="margin-top:14px">Este acompañamiento es educativo y complementario; no reemplaza atención médica ni psicológica.</p>
+<script src="/assets/js/password.js"></script>
 <?php paginaFin();

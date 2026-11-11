@@ -7,8 +7,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = trim($_POST['correo'] ?? '');
   $telefono = trim($_POST['whatsapp'] ?? '');
   $password = $_POST['password'] ?? '';
+  $password2 = $_POST['password2'] ?? '';
 
   if (!empty($_POST['sitio_web'] ?? '')) exit; // campo trampa anti-spam
+
+  if ($password !== $password2) {
+    header('Location: /registrate.html?error=clave');
+    exit;
+  }
 
   if ($nombre && filter_var($email, FILTER_VALIDATE_EMAIL) && strlen($password) >= 8) {
     $pdo = conexionDB();
@@ -19,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($usuarioExistente) {
       // Ya existe una cuenta con ese correo — lo mandamos a iniciar sesión en vez de duplicarla.
-      header('Location: /login.html?error=correo-existente');
+      header('Location: /registrate.html?error=correo-existente');
       exit;
     }
 
@@ -42,5 +48,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 }
-header('Location: /login.html?error=1');
+header('Location: /registrate.html?error=1');
 exit;

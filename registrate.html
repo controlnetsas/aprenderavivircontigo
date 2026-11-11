@@ -67,6 +67,10 @@
           <label for="registro-password">Crea una contraseña*</label>
           <input type="password" id="registro-password" name="password" required minlength="8">
         </div>
+        <div>
+          <label for="registro-password2">Confirma tu contraseña*</label>
+          <input type="password" id="registro-password2" name="password2" required minlength="8" autocomplete="new-password">
+        </div>
         <!-- Campo trampa anti-spam: se deja oculto por CSS, si un bot lo llena se ignora el envío -->
         <div style="position:absolute;left:-9999px;" aria-hidden="true">
           <label for="sitio_web">No llenar</label>
@@ -126,6 +130,7 @@
   </div>
 </footer>
 <script src="assets/js/main.js"></script>
+<script src="assets/js/password.js"></script>
 <script>
   (function () {
     var params = new URLSearchParams(window.location.search);
@@ -137,6 +142,7 @@
 
     var mensajes = {
       'correo-existente': 'Ya existe una cuenta con ese correo — ve a Iniciar sesión en vez de registrarte de nuevo.',
+      'clave': 'Las contraseñas no coinciden. Vuelve a escribirlas.',
       '1': 'Revisa tus datos: verifica tu nombre, correo y que la contraseña tenga al menos 8 caracteres.'
     };
 

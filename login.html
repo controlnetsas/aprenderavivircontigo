@@ -7,6 +7,8 @@
 <meta name="description" content="Inicia sesión o crea tu cuenta en Aprender a Vivir Contigo para acceder al Club de Membresía y agendar tus terapias.">
 <link rel="icon" type="image/png" href="assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#211A33">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -38,67 +40,31 @@
 <section class="page-hero">
   <div class="container">
     <span class="small-caps on-dark eyebrow-gap">Tu cuenta</span>
-    <h1>Ingresa o crea tu cuenta</h1>
-    <p>Con una sola cuenta accedes al Club de Membresía (si ya está activa) y puedes agendar y pagar tus terapias en línea.</p>
+    <h1>Iniciar sesión</h1>
+    <p>Con tu cuenta accedes al Club de Membresía (si ya está activa) y puedes agendar tus terapias en línea.</p>
   </div>
 </section>
 
 <section>
   <div class="container">
-    <div class="grid-2" style="max-width:920px;margin:0 auto;align-items:flex-start;">
-
-      <!-- Ingresar -->
-      <div class="card">
-        <span class="small-caps eyebrow-gap">Ya tengo cuenta</span>
-        <h3 class="mt-0">Iniciar sesión</h3>
-        <form id="form-login" class="formulario" action="login.php" method="post" novalidate>
-          <div>
-            <label for="login-correo">Correo electrónico*</label>
-            <input type="email" id="login-correo" name="correo" required>
-          </div>
-          <div>
-            <label for="login-password">Contraseña*</label>
-            <input type="password" id="login-password" name="password" required minlength="8">
-          </div>
-          <div id="login-status" class="form-status" role="status"></div>
-          <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
-        </form>
-      </div>
-
-      <!-- Crear cuenta -->
-      <div class="card">
-        <span class="small-caps eyebrow-gap">Primera vez aquí</span>
-        <h3 class="mt-0">Crear mi cuenta</h3>
-        <form id="form-registro-cuenta" class="formulario" action="registro-cuenta.php" method="post" novalidate>
-          <div>
-            <label for="registro-nombre">Nombre*</label>
-            <input type="text" id="registro-nombre" name="nombre" required>
-          </div>
-          <div>
-            <label for="registro-correo">Correo electrónico*</label>
-            <input type="email" id="registro-correo" name="correo" required>
-          </div>
-          <div>
-            <label for="registro-whatsapp">WhatsApp (opcional)</label>
-            <input type="tel" id="registro-whatsapp" name="whatsapp">
-          </div>
-          <div>
-            <label for="registro-password">Crea una contraseña*</label>
-            <input type="password" id="registro-password" name="password" required minlength="8">
-          </div>
-          <!-- Campo trampa anti-spam: se deja oculto por CSS, si un bot lo llena se ignora el envío -->
-          <div style="position:absolute;left:-9999px;" aria-hidden="true">
-            <label for="sitio_web">No llenar</label>
-            <input type="text" id="sitio_web" name="sitio_web" tabindex="-1" autocomplete="off">
-          </div>
-          <div id="registro-cuenta-status" class="form-status" role="status"></div>
-          <button type="submit" class="btn btn-outline-dark btn-block">Crear mi cuenta</button>
-        </form>
-        <p style="font-size:0.78rem;color:var(--azul-noche);opacity:0.7;margin-top:14px;">
-          Crear la cuenta te suscribe a nuestro boletín. El Club de Membresía se activa automáticamente cuando compras un taller o plan de membresía.
-        </p>
-      </div>
-
+    <div class="card" style="max-width:420px;margin:0 auto;">
+      <span class="small-caps eyebrow-gap">Ya tengo cuenta</span>
+      <h3 class="mt-0">Iniciar sesión</h3>
+      <form id="form-login" class="formulario" action="login.php" method="post" novalidate>
+        <div>
+          <label for="login-correo">Correo electrónico*</label>
+          <input type="email" id="login-correo" name="correo" required>
+        </div>
+        <div>
+          <label for="login-password">Contraseña*</label>
+          <input type="password" id="login-password" name="password" required minlength="8">
+        </div>
+        <div id="login-status" class="form-status" role="status"></div>
+        <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+      </form>
+      <p style="font-size:0.9rem;margin-top:18px;text-align:center;">
+        ¿Primera vez aquí? <a href="registrate.html" style="color:var(--rosa-vinculo);text-decoration:underline;">Regístrate aquí</a>.
+      </p>
     </div>
   </div>
 </section>
@@ -149,18 +115,18 @@
     var error = params.get('error');
     if (!error) return;
 
-    var status = document.getElementById('login-status') || document.getElementById('registro-cuenta-status');
+    var status = document.getElementById('login-status');
     if (!status) return;
 
     var mensajes = {
       'no-verificado': 'Tu correo aún no está confirmado. Revisa tu bandeja de entrada (o spam) y haz clic en el enlace que te enviamos.',
-      'token-invalido': 'Ese enlace de confirmación ya no es válido o ya fue usado. Si tu cuenta ya está activa, inicia sesión normalmente.',
-      'correo-existente': 'Ya existe una cuenta con ese correo. Inicia sesión aquí, o usa "¿Olvidaste tu contraseña?" si no la recuerdas.'
+      'token-invalido': 'Ese enlace de confirmación ya no es válido o ya fue usado. Si tu cuenta ya está activa, inicia sesión normalmente.'
     };
 
-    status.textContent = mensajes[error] || 'Revisa tus datos: correo/contraseña incorrectos.';
+    status.textContent = mensajes[error] || 'Correo o contraseña incorrectos.';
     status.className = 'form-status error';
   })();
 </script>
+<script src="assets/js/password.js"></script>
 </body>
 </html>
