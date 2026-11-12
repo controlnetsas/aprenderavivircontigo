@@ -130,6 +130,14 @@
     };
 
     status.textContent = mensajes[error] || 'Correo o contraseña incorrectos.';
+    if (error === 'no-verificado') {
+      status.appendChild(document.createElement('br'));
+      var a = document.createElement('a');
+      a.href = 'olvide-clave.php';
+      a.textContent = 'Reenviar el correo de confirmación';
+      a.style.cssText = 'font-weight:700;text-decoration:underline;color:inherit;';
+      status.appendChild(a);
+    }
     status.className = 'form-status error';
   })();
 </script>
