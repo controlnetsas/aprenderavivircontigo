@@ -1,5 +1,6 @@
 <?php
 require_once file_exists(__DIR__ . '/../config.php') ? __DIR__ . '/../config.php' : __DIR__ . '/config.php';
+require_once __DIR__ . '/correos.php';
 
 // IDs de las listas de Brevo, una por taller — reemplaza con los tuyos (Brevo → Contactos → Listas).
 $MAPA_LISTAS_BREVO = [
@@ -78,7 +79,7 @@ function enviarCorreoConfirmacion($nombre, $email, $linkConfirmacion) {
   $primerNombre = explode(' ', trim($nombre))[0];
 
   $html = '
-    <div style="font-family:Poppins,Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#FDF9F2;border-radius:16px;">
+    <div>
       <h2 style="color:#211A33;">Hola, ' . htmlspecialchars($primerNombre) . '</h2>
       <p style="color:#211A33;">Gracias por crear tu cuenta en <strong>Aprender a Vivir Contigo</strong>. Confirma tu correo para activarla:</p>
       <p style="text-align:center;margin:28px 0;">
@@ -87,24 +88,5 @@ function enviarCorreoConfirmacion($nombre, $email, $linkConfirmacion) {
       <p style="color:#211A33;font-size:0.85rem;">Si el botón no funciona, copia y pega este enlace en tu navegador:<br>' . htmlspecialchars($linkConfirmacion) . '</p>
     </div>';
 
-  $body = [
-    'sender' => ['name' => 'Aprender a Vivir Contigo', 'email' => 'talleres@aprenderavivircontigo.com'],
-    'to' => [['email' => $email, 'name' => $nombre]],
-    'subject' => 'Confirma tu correo — Aprender a Vivir Contigo',
-    'htmlContent' => $html,
-  ];
-
-  $ch = curl_init('https://api.brevo.com/v3/smtp/email');
-  curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST => true,
-    CURLOPT_POSTFIELDS => json_encode($body),
-    CURLOPT_HTTPHEADER => [
-      'api-key: ' . BREVO_API_KEY,
-      'Content-Type: application/json',
-    ],
-  ]);
-  $respuesta = curl_exec($ch);
-  curl_close($ch);
-  return $respuesta;
+  return enviarCorreo($email, $nombre, 'Confirma tu correo — Aprender a Vivir Contigo', $html);
 }

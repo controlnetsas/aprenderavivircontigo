@@ -9,10 +9,12 @@ function textoSeguro($s) {
   return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-// Envía un correo con la identidad visual de la marca. Devuelve true si Brevo lo aceptó.
-function enviarCorreo($email, $nombre, $asunto, $contenidoHtml) {
-  if (!defined('BREVO_API_KEY') || !BREVO_API_KEY) return false;
+if (!defined('CORREO_REMITENTE')) define('CORREO_REMITENTE', 'talleres@aprenderavivircontigo.com');
 
+// Envía un correo con la identidad visual de la marca. Devuelve true si algún método lo aceptó.
+// Orden: 1) SMTP del buzón de Hostinger (si config.php define SMTP_USER y SMTP_PASS),
+//        2) Brevo (si el remitente está verificado), 3) mail() del servidor.
+function enviarCorreo($email, $nombre, $asunto, $contenidoHtml) {
   $html = '<div style="font-family:Poppins,Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#FDF9F2;border-radius:16px;color:#211A33;line-height:1.55;">'
         . $contenidoHtml
         . '<hr style="border:none;border-top:1px solid #e8dfd0;margin:28px 0 14px;">'
@@ -20,28 +22,66 @@ function enviarCorreo($email, $nombre, $asunto, $contenidoHtml) {
         . 'Si no quieres seguir recibiendo estos mensajes, escríbenos por WhatsApp al +57 317 643 5131 y los detenemos.</p>'
         . '</div>';
 
+  if (defined('SMTP_USER') && SMTP_USER && defined('SMTP_PASS') && SMTP_PASS && correoSmtp($email, $nombre, $asunto, $html)) return true;
+  if (correoBrevo($email, $nombre, $asunto, $html)) return true;
+  return correoMailNativo($email, $nombre, $asunto, $html);
+}
+
+function correoBrevo($email, $nombre, $asunto, $html) {
+  if (!defined('BREVO_API_KEY') || !BREVO_API_KEY) return false;
   $body = [
-    'sender' => ['name' => 'Aprender a Vivir Contigo', 'email' => 'talleres@aprenderavivircontigo.com'],
+    'sender' => ['name' => 'Aprender a Vivir Contigo', 'email' => CORREO_REMITENTE],
     'to' => [['email' => $email, 'name' => $nombre]],
     'subject' => $asunto,
     'htmlContent' => $html,
   ];
-
   $ch = curl_init('https://api.brevo.com/v3/smtp/email');
   curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST => true,
-    CURLOPT_POSTFIELDS => json_encode($body),
-    CURLOPT_TIMEOUT => 15,
-    CURLOPT_HTTPHEADER => [
-      'api-key: ' . BREVO_API_KEY,
-      'Content-Type: application/json',
-    ],
+    CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($body), CURLOPT_TIMEOUT => 15,
+    CURLOPT_HTTPHEADER => ['api-key: ' . BREVO_API_KEY, 'Content-Type: application/json'],
   ]);
   curl_exec($ch);
   $codigo = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
   curl_close($ch);
   return $codigo >= 200 && $codigo < 300;
+}
+
+function cabecerasMime($email, $nombre, $asunto, $html) {
+  $enc = fn($t) => '=?UTF-8?B?' . base64_encode($t) . '?=';
+  $h = 'From: ' . $enc('Aprender a Vivir Contigo') . ' <' . CORREO_REMITENTE . ">\r\n"
+     . 'To: ' . $enc($nombre ?: $email) . ' <' . $email . ">\r\n"
+     . 'Subject: ' . $enc($asunto) . "\r\n"
+     . 'Date: ' . date('r') . "\r\n"
+     . 'Message-ID: <' . bin2hex(random_bytes(8)) . '@aprenderavivircontigo.com>' . "\r\n"
+     . "MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n";
+  return [$h, chunk_split(base64_encode($html))];
+}
+
+// mail() de Hostinger: no necesita claves. Funciona mejor si existe el buzón talleres@ en Hostinger.
+function correoMailNativo($email, $nombre, $asunto, $html) {
+  list($h, $cuerpo) = cabecerasMime($email, $nombre, $asunto, $html);
+  $h = preg_replace('/^(To|Subject): .*\r\n/m', '', $h); // mail() los agrega por su cuenta
+  $asuntoCod = '=?UTF-8?B?' . base64_encode($asunto) . '?=';
+  return @mail($email, $asuntoCod, $cuerpo, $h, '-f' . CORREO_REMITENTE);
+}
+
+// SMTP directo con el buzón de Hostinger (smtp.hostinger.com, puerto 465 SSL).
+function correoSmtp($email, $nombre, $asunto, $html) {
+  $host = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.hostinger.com';
+  $puerto = defined('SMTP_PORT') ? (int)SMTP_PORT : 465;
+  $f = @stream_socket_client('ssl://' . $host . ':' . $puerto, $en, $es, 15);
+  if (!$f) { error_log("SMTP: no conecta ($es)"); return false; }
+  stream_set_timeout($f, 15);
+  $leer = function () use ($f) { $r = ''; while (($l = fgets($f, 515)) !== false) { $r .= $l; if (strlen($l) < 4 || $l[3] === ' ') break; } return $r; };
+  $cmd = function ($c, $ok) use ($f, $leer) { if ($c !== null) fwrite($f, $c . "\r\n"); $r = $leer(); return strpos($r, (string)$ok) === 0; };
+  list($h, $cuerpo) = cabecerasMime($email, $nombre, $asunto, $html);
+  $bien = $cmd(null, 220) && $cmd('EHLO aprenderavivircontigo.com', 250)
+    && $cmd('AUTH LOGIN', 334) && $cmd(base64_encode(SMTP_USER), 334) && $cmd(base64_encode(SMTP_PASS), 235)
+    && $cmd('MAIL FROM:<' . SMTP_USER . '>', 250) && $cmd('RCPT TO:<' . $email . '>', 250) && $cmd('DATA', 354);
+  if ($bien) { fwrite($f, $h . "\r\n" . $cuerpo . "\r\n.\r\n"); $bien = $cmd(null, 250); }
+  @fwrite($f, "QUIT\r\n"); @fclose($f);
+  if (!$bien) error_log('SMTP: falló el envío a ' . $email);
+  return $bien;
 }
 
 function botonCorreo($url, $texto) {
