@@ -1,4 +1,36 @@
 // Aprender a Vivir Contigo — comportamiento común del sitio
+
+// Registro del Service Worker (habilita instalar el sitio como app — PWA).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function (err) {
+      console.warn('No se pudo registrar el service worker:', err);
+    });
+  });
+}
+
+// Botón "Instalar app" — aparece solo cuando el navegador confirma que se puede instalar
+// (principalmente Chrome/Android; iOS/Safari no dispara este evento, ahí se instala
+// manualmente desde "Compartir → Añadir a pantalla de inicio").
+var eventoInstalacion = null;
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault();
+  eventoInstalacion = e;
+  var btn = document.getElementById('btn-instalar-app');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  var btnInstalar = document.getElementById('btn-instalar-app');
+  if (btnInstalar) {
+    btnInstalar.addEventListener('click', function () {
+      if (!eventoInstalacion) return;
+      eventoInstalacion.prompt();
+      eventoInstalacion.userChoice.then(function () { eventoInstalacion = null; });
+    });
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function () {
   var toggle = document.querySelector('.nav-toggle');
   var nav = document.querySelector('.main-nav');
@@ -13,9 +45,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Formulario de contacto: valida y arma un mensaje de WhatsApp / mailto
-  // (el sitio es 100% estático; si más adelante agregan un backend en PHP,
-  // este mismo formulario puede apuntar a ese script en vez de este JS).
+  // Formulario de contacto: valida, abre WhatsApp con el mensaje listo (igual que antes)
+  // y, en paralelo, guarda el contacto en el servidor (base de datos + HubSpot + Brevo)
+  // vía procesar-inscripcion.php. Si ese guardado falla por cualquier razón, el envío
+  // por WhatsApp de todas formas se completa con normalidad.
   var form = document.getElementById('form-contacto');
   if (form) {
     form.addEventListener('submit', function (e) {
@@ -32,6 +65,23 @@ document.addEventListener('DOMContentLoaded', function () {
         status.className = 'form-status error';
         return;
       }
+
+      // Guarda el contacto en el servidor (no bloquea ni depende del resultado).
+      try {
+        var datos = new URLSearchParams({
+          nombre: nombre,
+          whatsapp: whatsapp,
+          correo: correo,
+          taller: taller,
+          sitio_web: '' // campo trampa anti-spam, siempre vacío en un envío humano
+        });
+        fetch('procesar-inscripcion-ajax.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: datos,
+          keepalive: true
+        }).catch(function () { /* silencioso: WhatsApp sigue funcionando igual */ });
+      } catch (err) { /* silencioso */ }
 
       var texto = 'Hola, soy ' + nombre + '. ';
       texto += 'Me interesa: ' + taller + '. ';
