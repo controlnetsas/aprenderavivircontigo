@@ -53,10 +53,8 @@ paginaInicio('Bienvenida a tu proceso');
   <p class="bv-eti">Reconoce tu esencia</p>
   <h1>Bienvenido/a a tu proceso</h1>
   <p>Dar este paso es un acto de valentía. Aquí te acompaño con respeto, sin juicio y a tu ritmo.</p>
-<?php if ($destino): ?>
   <p class="bv-hero-cta"><strong>Regístrate para iniciar el camino de Aprender a Vivir Contigo</strong></p>
-  <a class="bv-hero-btn" href="#registro">Registrarme ahora</a>
-<?php endif; ?>
+  <a class="bv-hero-btn" href="<?= $destino ? '#registro' : '/registrate.html' ?>">Registrarme ahora</a>
 </div>
 
 <div class="bv bv-que">
@@ -131,8 +129,7 @@ paginaInicio('Bienvenida a tu proceso');
 </div>
 <?php endif; ?>
 <div class="bv bv-login" id="login">
-  <p class="bv-eti" style="color:#C2607D">Ya tengo cuenta</p>
-  <h2>Iniciar sesión</h2>
+  <h2>Ya tengo cuenta: iniciar sesión</h2>
   <form method="post" action="/login.php">
     <label class="etq" for="l-correo">Correo electrónico*</label>
     <input class="campo" id="l-correo" name="correo" type="email" required autocomplete="username">
