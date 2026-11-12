@@ -118,13 +118,12 @@ paginaInicio('Bienvenida a tu proceso');
       <span class="mut"><?= h(TEXTO_CONSENTIMIENTO_EVAL) ?></span>
     </label>
     <?php else: ?><div style="height:14px"></div><?php endif; ?>
-    <button class="btn btn-primary btn-block" type="submit" style="width:100%;flex-direction:column;line-height:1.3;white-space:normal;border-radius:28px;padding:14px 16px">Crear mi cuenta<small style="display:block;font-weight:500;font-size:12px;margin-top:3px;text-align:center">¡Después de este click vendrán muchos cambios!</small></button>
+    <button class="btn btn-primary btn-block" type="submit" style="width:100%;flex-direction:column;line-height:1.3;white-space:normal;border-radius:28px;padding:14px 16px">Crear mi cuenta<small style="display:block;font-weight:600;font-size:17px;margin-top:6px;text-align:center">¡Después de este click vendrán muchos cambios!</small></button>
     <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
   </form>
   <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
 </div>
 <div class="bv bv-login" id="login">
-  <h2>Ya tengo cuenta: iniciar sesión</h2>
   <form method="post" action="/login.php">
     <label class="etq" for="l-correo">Correo electrónico*</label>
     <input class="campo" id="l-correo" name="correo" type="email" required autocomplete="username">
