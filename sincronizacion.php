@@ -11,6 +11,7 @@ $MAPA_LISTAS_BREVO = [
 ];
 
 function sincronizarContactoHubSpot($nombre, $email) {
+  if (!defined('HUBSPOT_PRIVATE_APP_TOKEN') || !HUBSPOT_PRIVATE_APP_TOKEN) { error_log('HubSpot: falta HUBSPOT_PRIVATE_APP_TOKEN en config.php'); return; }
   $partes = explode(' ', $nombre, 2);
   $data = json_encode([
     'properties' => [
@@ -36,6 +37,7 @@ function sincronizarContactoHubSpot($nombre, $email) {
 }
 
 function sincronizarContactoBrevo($nombre, $email, $telefono, $taller) {
+  if (!defined('BREVO_API_KEY') || !BREVO_API_KEY) { error_log('Brevo: falta BREVO_API_KEY en config.php'); return; }
   global $MAPA_LISTAS_BREVO;
   $partes = explode(' ', $nombre, 2);
   $listaId = $MAPA_LISTAS_BREVO[$taller] ?? null;
