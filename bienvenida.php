@@ -33,7 +33,7 @@ paginaInicio('Bienvenida a tu proceso');
 .bv-ayuda{background:#fff6d9;border-left:6px solid #F5C343}
 .bv-reg{background:linear-gradient(135deg,#F5C343,#f3a65c);color:#211A33;text-align:center;padding:30px 22px}
 .bv-reg h2{font-size:1.8rem}.bv-reg{padding:38px 22px;box-shadow:0 10px 30px rgba(245,195,67,.45)}
-.bv-reg .btn-primary{background:#211A33;color:#fff;font-size:19px;padding:17px 34px}.bv-form .btn-primary{font-size:19px;padding:16px}
+.bv-reg .btn-primary{background:#211A33;color:#fff;font-size:19px;padding:17px 34px}.bv-form .btn-primary{font-size:18px;padding:16px;justify-content:center;text-align:center}
 .bv-reg .btn-outline-dark{background:rgba(255,255,255,.6)}
 .bv-reg .mut{color:#211A33;opacity:.8;font-size:14px}
 .bv-login{background:#fff;max-width:460px;margin:0 auto 16px;box-shadow:0 6px 24px rgba(33,26,51,.08)}.bv-login .etq{display:block;font-size:13px;font-weight:600;margin:12px 0 3px}.bv-login .btn-primary{background:#F5C343;color:#211A33;font-size:17px;padding:14px}
@@ -41,12 +41,12 @@ paginaInicio('Bienvenida a tu proceso');
 .bv-firma{text-align:center;color:#6b6480;font-size:14px;margin-top:6px}
 .bv-barra{position:fixed;left:0;right:0;bottom:0;background:#211A33;padding:10px 16px;text-align:center;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
 .bv-barra a{display:inline-block;background:#F5C343;color:#211A33;font-family:Poppins,Arial,sans-serif;font-weight:600;border-radius:30px;padding:11px 26px;text-decoration:none}
-.bv-form{display:none;background:#fff;border-radius:16px;padding:20px 22px;text-align:left;margin:16px auto 0;max-width:560px;box-shadow:0 6px 20px rgba(33,26,51,.15)}
+.bv-form{display:block;background:#fff;border-radius:16px;padding:20px 22px;text-align:left;margin:16px auto 0;max-width:560px;box-shadow:0 6px 20px rgba(33,26,51,.15)}
 .bv-form .etq{display:block;font-size:13px;font-weight:600;margin:10px 0 3px;color:#211A33}
 .bv-form .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 .bv-form .mut{color:#6b6480;opacity:1;font-size:13px}
-@media(min-width:900px){.bv-form{display:block}.solo-movil{display:none!important}.bv-barra{display:none}}
-@media(max-width:600px){.bv-hero h1{font-size:1.6rem}.pasos4{grid-template-columns:1fr}}
+@media(min-width:900px){.bv-barra{display:none}}
+@media(max-width:600px){.bv-form .g2{grid-template-columns:1fr}.bv-hero h1{font-size:1.6rem}.pasos4{grid-template-columns:1fr}}
 </style>
 
 <div class="bv bv-hero">
@@ -54,7 +54,7 @@ paginaInicio('Bienvenida a tu proceso');
   <h1>Bienvenido/a a tu proceso</h1>
   <p>Dar este paso es un acto de valentía. Aquí te acompaño con respeto, sin juicio y a tu ritmo.</p>
   <p class="bv-hero-cta"><strong>Regístrate para iniciar el camino de Aprender a Vivir Contigo</strong></p>
-  <a class="bv-hero-btn" href="<?= $destino ? '#registro' : '/registrate.html' ?>">Registrarme ahora</a>
+  <a class="bv-hero-btn" href="#registro">Registrarme ahora</a>
 </div>
 
 <div class="bv bv-que">
@@ -94,48 +94,43 @@ paginaInicio('Bienvenida a tu proceso');
   </ul>
 </div>
 
-<?php if ($destino): ?>
 <div class="bv bv-reg" id="registro">
-  <h2>¿Listo/a para empezar?</h2>
-      <p style="font-size:18px"><strong>Crea tu cuenta para comenzar.</strong> Te toma un par de minutos.</p>
-    <p class="fila solo-movil" style="justify-content:center;margin-top:14px">
-      <a class="btn btn-primary" href="<?= h($destino) ?>">Registrarme y comenzar</a>
-    </p>
-    <form class="bv-form" method="post" action="/evaluacion.php" autocomplete="off">
-      <input type="hidden" name="t" value="<?= h($token) ?>">
-      <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="sitio_web" tabindex="-1" autocomplete="off"></div>
-      <label class="etq" for="b-nombre">Nombre completo</label>
-      <input class="campo" id="b-nombre" name="nombre" required maxlength="150">
-      <div class="g2">
-        <div><label class="etq" for="b-correo">Correo electrónico</label>
-        <input class="campo" id="b-correo" name="correo" type="email" required maxlength="190"></div>
-        <div><label class="etq" for="b-cel">Número de celular</label>
-        <input class="campo" id="b-cel" name="celular" type="tel" required maxlength="30" placeholder="3001234567"></div>
-        <div><label class="etq" for="b-p1">Contraseña (mín. 8)</label>
-        <input class="campo" id="b-p1" name="password" type="password" minlength="8" required autocomplete="new-password"></div>
-        <div><label class="etq" for="b-p2">Confirma tu contraseña</label>
-        <input class="campo" id="b-p2" name="password2" type="password" minlength="8" required autocomplete="new-password"></div>
-      </div>
-      <label style="display:flex;gap:10px;margin:14px 0;align-items:flex-start">
-        <input type="checkbox" name="consentimiento" value="1" required style="margin-top:4px">
-        <span class="mut"><?= h(TEXTO_CONSENTIMIENTO_EVAL) ?></span>
-      </label>
-      <button class="btn btn-primary btn-block" type="submit" style="width:100%">Crear mi cuenta y comenzar</button>
-      <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
-    </form>
-    <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
-  
-  <p class="mut" style="margin-top:6px;font-size:13px">¿Dudas? <a target="_blank" rel="noopener" href="<?= h($wa) ?>" style="color:#211A33;text-decoration:underline">Escríbeme por WhatsApp</a></p>
-</div>
-<?php endif; ?>
-<div class="bv bv-login" id="login">
   <h2>Regístrate para iniciar el camino de Aprender a Vivir Contigo</h2>
+  <p style="font-size:18px">Crea tu cuenta. Te toma un par de minutos.</p>
+  <form class="bv-form" method="post" action="<?= $destino ? '/evaluacion.php' : '/registro-cuenta.php' ?>" autocomplete="off">
+    <?php if ($destino): ?><input type="hidden" name="t" value="<?= h($token) ?>"><?php endif; ?>
+    <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="sitio_web" tabindex="-1" autocomplete="off"></div>
+    <label class="etq" for="b-nombre">Nombre completo*</label>
+    <input class="campo" id="b-nombre" name="nombre" required maxlength="150">
+    <div class="g2">
+      <div><label class="etq" for="b-correo">Correo electrónico*</label>
+      <input class="campo" id="b-correo" name="correo" type="email" required maxlength="190"></div>
+      <div><label class="etq" for="b-cel">Número de celular*</label>
+      <input class="campo" id="b-cel" name="<?= $destino ? 'celular' : 'whatsapp' ?>" type="tel" required maxlength="30" placeholder="3001234567"></div>
+      <div><label class="etq" for="b-p1">Contraseña* (mín. 8)</label>
+      <input class="campo" id="b-p1" name="password" type="password" minlength="8" required autocomplete="new-password"></div>
+      <div><label class="etq" for="b-p2">Confirma tu contraseña*</label>
+      <input class="campo" id="b-p2" name="password2" type="password" minlength="8" required autocomplete="new-password"></div>
+    </div>
+    <?php if ($destino): ?>
+    <label style="display:flex;gap:10px;margin:14px 0;align-items:flex-start">
+      <input type="checkbox" name="consentimiento" value="1" required style="margin-top:4px">
+      <span class="mut"><?= h(TEXTO_CONSENTIMIENTO_EVAL) ?></span>
+    </label>
+    <?php else: ?><div style="height:14px"></div><?php endif; ?>
+    <button class="btn btn-primary btn-block" type="submit" style="width:100%">Crear mi cuenta</button>
+    <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
+  </form>
+  <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
+</div>
+<div class="bv bv-login" id="login">
+  <h2>Ya tengo cuenta: iniciar sesión</h2>
   <form method="post" action="/login.php">
     <label class="etq" for="l-correo">Correo electrónico*</label>
     <input class="campo" id="l-correo" name="correo" type="email" required autocomplete="username">
     <label class="etq" for="l-pass">Contraseña*</label>
     <input class="campo" id="l-pass" name="password" type="password" required minlength="8" autocomplete="current-password">
-    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px;justify-content:center;text-align:center">Ingresar</button>
+    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px;justify-content:center;text-align:center;flex-direction:column;line-height:1.3">Ingresar<small style="display:block;font-weight:500;font-size:12px;margin-top:3px">¡Después de este click vendrán muchos cambios!</small></button>
   </form>
   <p style="text-align:center;font-size:14px;margin:14px 0 0"><a href="/olvide-clave.php" style="color:#C2607D;text-decoration:underline">¿Olvidaste tu contraseña?</a></p>
 </div>
@@ -145,5 +140,6 @@ paginaInicio('Bienvenida a tu proceso');
 </div>
 <p class="bv-firma">Con cariño, Aprender a Vivir Contigo</p>
 
-<?php if ($destino): ?><div class="bv-barra"><a href="<?= h($destino) ?>">Registrarme y comenzar</a></div><div style="height:50px"></div><?php endif; ?>
+<div class="bv-barra"><a href="#registro">Registrarme y comenzar</a></div><div style="height:50px"></div>
+<script src="/assets/js/password.js"></script>
 <?php paginaFin();
