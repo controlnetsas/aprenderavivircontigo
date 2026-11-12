@@ -19,6 +19,7 @@ paginaInicio('Bienvenida a tu proceso');
 .bv-hero h1{color:#fff;font-size:2rem;margin:.1em 0 .3em}
 .bv-hero p{color:rgba(255,255,255,.92);max-width:44ch;margin:0 auto;font-size:17px}
 .bv-hero .bv-eti{color:#F5C343}
+.bv-hero-cta{margin:18px auto 12px!important;font-family:Poppins,Arial,sans-serif;font-size:19px!important;color:#F5C343!important}.bv-hero-btn{display:inline-block;background:#F5C343;color:#211A33;font-family:Poppins,Arial,sans-serif;font-weight:600;border-radius:30px;padding:12px 30px;text-decoration:none}
 .bv-que{background:#fff3f6;border-left:6px solid #C2607D}
 .bv-camino{background:#fff}
 .pasos4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
@@ -52,6 +53,10 @@ paginaInicio('Bienvenida a tu proceso');
   <p class="bv-eti">Reconoce tu esencia</p>
   <h1>Bienvenido/a a tu proceso</h1>
   <p>Dar este paso es un acto de valentía. Aquí te acompaño con respeto, sin juicio y a tu ritmo.</p>
+<?php if ($destino): ?>
+  <p class="bv-hero-cta"><strong>Regístrate para iniciar el camino de Aprender a Vivir Contigo</strong></p>
+  <a class="bv-hero-btn" href="#registro">Registrarme ahora</a>
+<?php endif; ?>
 </div>
 
 <div class="bv bv-que">
@@ -91,10 +96,10 @@ paginaInicio('Bienvenida a tu proceso');
   </ul>
 </div>
 
+<?php if ($destino): ?>
 <div class="bv bv-reg" id="registro">
   <h2>¿Listo/a para empezar?</h2>
-  <?php if ($destino): ?>
-    <p style="font-size:18px"><strong>Crea tu cuenta para comenzar.</strong> Te toma un par de minutos.</p>
+      <p style="font-size:18px"><strong>Crea tu cuenta para comenzar.</strong> Te toma un par de minutos.</p>
     <p class="fila solo-movil" style="justify-content:center;margin-top:14px">
       <a class="btn btn-primary" href="<?= h($destino) ?>">Registrarme y comenzar</a>
     </p>
@@ -121,12 +126,10 @@ paginaInicio('Bienvenida a tu proceso');
       <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
     </form>
     <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
-  <?php else: ?>
-    <p>Para registrarte, usa el enlace personal que te envió tu terapeuta.</p>
-    <p class="mut">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
-  <?php endif; ?>
+  
   <p class="mut" style="margin-top:6px;font-size:13px">¿Dudas? <a target="_blank" rel="noopener" href="<?= h($wa) ?>" style="color:#211A33;text-decoration:underline">Escríbeme por WhatsApp</a></p>
 </div>
+<?php endif; ?>
 <div class="bv bv-login" id="login">
   <p class="bv-eti" style="color:#C2607D">Ya tengo cuenta</p>
   <h2>Iniciar sesión</h2>
