@@ -11,7 +11,7 @@ if (!$terapeuta || ($terapeuta['rol'] ?? '') !== 'terapeuta') {
   http_response_code(403);
   paginaInicio('Acceso restringido');
   echo '<div class="card"><h1>Acceso solo para el terapeuta</h1><p>Esta cuenta (' . h($terapeuta['email'] ?? '') . ') no tiene permisos de terapeuta.</p>'
-     . '<p><a class="btn btn-primary" href="/membresia.php">Ir a mi cuenta</a></p></div>';
+     . '<p><a class="btn btn-primary" href="/membresia.php">Ir a mi cuenta</a> &nbsp; <a href="/terapeuta-registro.php">Soy terapeuta: activar mi portal</a></p></div>';
   paginaFin(); exit;
 }
 $pdo = conexionDB();
@@ -64,11 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['flash_nuevo'] = ['lnk' => $lnk, 'nombre' => $nom, 'cel' => $cel, 'expira' => $expira, 'tests' => $nombresTests];
     }
   } elseif ($accion === 'revocar') {
-    $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 0 WHERE id = ? AND terapeuta_usuario_id = ?")->execute([(int)($_POST['id'] ?? 0), $tid]);
+    $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 0 WHERE id = ?")->execute([(int)($_POST['id'] ?? 0)]);
     $_SESSION['flash'] = ['ok', 'Enlace desactivado: ya no funciona.'];
   } elseif ($accion === 'extender') {
-    $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 1, expira_en = ? WHERE id = ? AND terapeuta_usuario_id = ? AND usos < usos_max")
-        ->execute([ahoraBogota('+3 days'), (int)($_POST['id'] ?? 0), $tid]);
+    $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 1, expira_en = ? WHERE id = ? AND usos < usos_max")
+        ->execute([ahoraBogota('+3 days'), (int)($_POST['id'] ?? 0)]);
     $_SESSION['flash'] = ['ok', 'Enlace reactivado por 3 días más.'];
   }
   header('Location: /portal-terapeuta.php'); exit;
@@ -77,13 +77,13 @@ $flash = $_SESSION['flash'] ?? null; $nuevo = $_SESSION['flash_nuevo'] ?? null;
 unset($_SESSION['flash'], $_SESSION['flash_nuevo']);
 
 // Enlaces recientes
-$q = $pdo->prepare("SELECT * FROM enlaces_evaluacion WHERE terapeuta_usuario_id = ? ORDER BY id DESC LIMIT 30");
-$q->execute([$tid]); $enlaces = $q->fetchAll(PDO::FETCH_ASSOC);
+$q = $pdo->prepare("SELECT * FROM enlaces_evaluacion ORDER BY id DESC LIMIT 30");
+$q->execute(); $enlaces = $q->fetchAll(PDO::FETCH_ASSOC);
 
 // Evaluaciones
 $l = $pdo->prepare("SELECT e.id, e.estado, e.creado_en, e.completada_en, u.nombre, u.email, u.telefono, u.email_verificado, u.fecha_vencimiento
-                    FROM evaluaciones e JOIN usuarios u ON u.id = e.usuario_id WHERE e.terapeuta_usuario_id = ? ORDER BY e.id DESC LIMIT 200");
-$l->execute([$tid]); $lista = $l->fetchAll(PDO::FETCH_ASSOC);
+                    FROM evaluaciones e JOIN usuarios u ON u.id = e.usuario_id ORDER BY e.id DESC LIMIT 200");
+$l->execute(); $lista = $l->fetchAll(PDO::FETCH_ASSOC);
 $tot = count($lista); $comp = 0; $curso = 0; $sinConf = 0;
 foreach ($lista as $r) {
   if ($r['estado'] === 'completada') $comp++;

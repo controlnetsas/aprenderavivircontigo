@@ -31,6 +31,7 @@ function requiereLoginApi() {
 }
 
 function esMiembroActivo($usuario) {
+  if ($usuario && ($usuario['rol'] ?? '') === 'terapeuta') return true; // el terapeuta (administrador) siempre tiene acceso completo
   return $usuario
     && $usuario['estado_membresia'] === 'activa'
     && (!$usuario['fecha_vencimiento'] || strtotime($usuario['fecha_vencimiento']) >= time());

@@ -6,8 +6,8 @@ require_once __DIR__ . '/ficha-campos.php';
 $terapeuta = requiereTerapeuta();
 $pdo = conexionDB();
 
-$s = $pdo->prepare("SELECT e.*, u.nombre, u.email, u.telefono FROM evaluaciones e JOIN usuarios u ON u.id = e.usuario_id WHERE e.id = ? AND e.terapeuta_usuario_id = ?");
-$s->execute([(int)($_GET['id'] ?? 0), $terapeuta['id']]);
+$s = $pdo->prepare("SELECT e.*, u.nombre, u.email, u.telefono FROM evaluaciones e JOIN usuarios u ON u.id = e.usuario_id WHERE e.id = ?");
+$s->execute([(int)($_GET['id'] ?? 0)]);
 $ev = $s->fetch(PDO::FETCH_ASSOC);
 if (!$ev) { http_response_code(404); paginaInicio('No encontrado'); echo '<div class="card"><p>No encontramos ese consultante. <a href="/evaluaciones.php">Volver</a></p></div>'; paginaFin(); exit; }
 $uid = (int)$ev['usuario_id'];
