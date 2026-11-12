@@ -106,7 +106,7 @@ $consultas = $lista->fetchAll(PDO::FETCH_ASSOC);
 paginaInicio('Panel del terapeuta');
 ?>
 <h1>Panel del terapeuta</h1>
-<p class="mut">Sesión de <?= h($terapeuta['nombre']) ?> · <a href="/membresia.php">Volver a la membresía</a></p>
+<p class="mut">Sesión de <?= h($terapeuta['nombre']) ?> · <a href="/membresia.php">Volver a la membresía</a> · <a href="/cambiar-clave.php">Cambiar contraseña</a></p>
 <?= $mensaje ?>
 <?= $tarjetaEnlace ?>
 
