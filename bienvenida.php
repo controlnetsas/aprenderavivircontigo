@@ -122,16 +122,6 @@ paginaInicio('Bienvenida a tu proceso');
     <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
   </form>
 </div>
-<div class="bv bv-login" id="login">
-  <form method="post" action="/login.php">
-    <label class="etq" for="l-correo">Correo electrónico*</label>
-    <input class="campo" id="l-correo" name="correo" type="email" required autocomplete="username">
-    <label class="etq" for="l-pass">Contraseña*</label>
-    <input class="campo" id="l-pass" name="password" type="password" required minlength="8" autocomplete="current-password">
-    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px;justify-content:center;text-align:center">Ingresar</button>
-  </form>
-  <p style="text-align:center;font-size:14px;margin:14px 0 0"><a href="/olvide-clave.php" style="color:#C2607D;text-decoration:underline">¿Olvidaste tu contraseña?</a></p>
-</div>
 <div class="bv bv-wa">
   <p style="margin:0 0 10px">¿Tienes dudas antes de empezar?</p>
   <a class="btn btn-outline-dark" target="_blank" rel="noopener" href="<?= h($wa) ?>">Escríbeme por WhatsApp</a>
