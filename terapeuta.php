@@ -9,6 +9,13 @@ $nueva = null;
 
 $plantillas = $pdo->query("SELECT id, clave, nombre FROM plantillas_seguimiento ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
 $catalogo = talleresCatalogo();
+$opcionesHeridas = [
+  'abandono' => 'Abandono',
+  'rechazo' => 'Rechazo',
+  'humillacion' => 'Humillación',
+  'traicion' => 'Traición',
+  'injusticia' => 'Injusticia',
+];
 $opcionesConflicto = [
   'heridas_infancia' => 'Heridas de infancia',
   'lealtad_ancestro' => 'Lealtad familiar con un ancestro',
@@ -42,7 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $trabajo = $campoTxt('trabajo_actual', 190);
     $profesion = $campoTxt('profesion', 190);
     $conflictos = array_values(array_intersect(array_keys($opcionesConflicto), (array)($_POST['conflictos'] ?? [])));
-    $conflictoDesc = $campoTxt('conflicto_descripcion', 4000);
+    $heridas = array_values(array_intersect(array_keys($opcionesHeridas), (array)($_POST['heridas'] ?? [])));
+    $detalles = [];
+    foreach ($conflictos as $k) {
+      $t = trim((string)($_POST['desc'][$k] ?? ''));
+      if ($t !== '') $detalles[$k] = mb_substr($t, 0, 2000);
+    }
+    $conflictoDesc = $detalles ? json_encode($detalles, JSON_UNESCAPED_UNICODE) : null;
     $notas = trim($_POST['notas_privadas'] ?? '');
     $msgTer = trim($_POST['mensaje_terapeuta'] ?? '');
     $talleres = array_values(array_intersect(array_keys($catalogo), (array)($_POST['talleres'] ?? [])));
@@ -59,13 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         "INSERT INTO consultas (terapeuta_usuario_id, nombre, email, whatsapp, fecha_consulta, notas_privadas,
            mensaje_terapeuta, plantilla_id, talleres_recomendados, token, token_expira,
            edad, sexo, sintomas, situacion_sentimental, hijos, hijos_no_nacidos, estado_salud, trabajo_actual, profesion,
-           conflictos_emocionales, conflicto_descripcion)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?, ?,?)"
+           conflictos_emocionales, conflicto_descripcion, heridas_infancia)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?, ?,?,?)"
       );
       $ins->execute([$terapeuta['id'], $nombre, $email, $whatsapp ?: null, $fecha, $notas ?: null,
         $msgTer ?: null, $plantillaId, implode(',', $talleres) ?: null, $token, $expira,
         $edad, $sexo, $sintomas, $situacion, $hijos, $hijosNoNac, $estadoSalud, $trabajo, $profesion,
-        implode(',', $conflictos) ?: null, $conflictoDesc]);
+        implode(',', $conflictos) ?: null, $conflictoDesc, implode(',', $heridas) ?: null]);
       $nueva = ['id' => (int)$pdo->lastInsertId(), 'nombre' => $nombre, 'email' => $email,
                 'whatsapp' => $whatsapp, 'token' => $token];
     }
@@ -145,13 +158,23 @@ paginaInicio('Panel del terapeuta');
 <?= $mensaje ?>
 <?= $tarjetaEnlace ?>
 <?php if ($ficha):
+  $detalleTxt = '';
+  $dj = json_decode((string)$ficha['conflicto_descripcion'], true);
+  if (is_array($dj)) {
+    foreach ($dj as $k => $t) $detalleTxt .= ($opcionesConflicto[$k] ?? $k) . ': ' . $t . "\n\n";
+  } elseif (!empty($ficha['conflicto_descripcion'])) {
+    $detalleTxt = (string)$ficha['conflicto_descripcion'];
+  }
+  $detalleTxt = trim($detalleTxt);
   $filas = [
     'Edad' => $ficha['edad'], 'Sexo' => $ficha['sexo'], 'Síntomas' => $ficha['sintomas'],
     'Situación sentimental' => $ficha['situacion_sentimental'], 'Hijos y nombres' => $ficha['hijos'],
     'Hijos no nacidos o muertos al nacer' => $ficha['hijos_no_nacidos'], 'Estado de salud' => $ficha['estado_salud'],
     'Trabajo actual' => $ficha['trabajo_actual'], 'Profesión' => $ficha['profesion'],
     'Conflicto emocional no resuelto' => implode(', ', array_map(fn($k) => $opcionesConflicto[$k] ?? $k, array_filter(explode(',', (string)$ficha['conflictos_emocionales'])))),
-    'Descripción del conflicto' => $ficha['conflicto_descripcion'], 'Notas privadas' => $ficha['notas_privadas'],
+    'Heridas de infancia' => implode(', ', array_map(fn($k) => $opcionesHeridas[$k] ?? $k, array_filter(explode(',', (string)$ficha['heridas_infancia'])))),
+    'Descripción por conflicto' => $detalleTxt,
+    'Notas privadas' => $ficha['notas_privadas'],
   ]; ?>
 <div class="card" style="margin:18px 0">
   <h2>Ficha de <?= h($ficha['nombre']) ?></h2>
@@ -206,13 +229,23 @@ paginaInicio('Panel del terapeuta');
         <input class="campo" id="profesion" name="profesion" maxlength="190"></div>
     </div>
 
-    <span class="etq" style="margin-top:20px">Conflicto emocional no resuelto (puedes marcar varios)</span>
+    <span class="etq" style="margin-top:22px">Conflicto emocional no resuelto</span>
+    <p class="mut" style="margin-top:0">Marca los que apliquen; al marcar cada uno se abre su casilla para describirlo.</p>
     <?php foreach ($opcionesConflicto as $clave => $etiqueta): ?>
-      <label style="display:inline-block;margin:4px 16px 4px 0"><input type="checkbox" name="conflictos[]" value="<?= h($clave) ?>"> <?= h($etiqueta) ?></label>
+      <div style="border:1px solid #eadfc9;border-radius:10px;padding:10px 14px;margin:8px 0;background:#fff">
+        <label><input type="checkbox" name="conflictos[]" value="<?= h($clave) ?>" data-abre="det-<?= h($clave) ?>"> <strong><?= h($etiqueta) ?></strong></label>
+        <div id="det-<?= h($clave) ?>" style="display:none;margin-top:8px">
+          <?php if ($clave === 'heridas_infancia'): ?>
+            <span class="mut">Herida(s) de infancia (puedes marcar varias):</span><br>
+            <?php foreach ($opcionesHeridas as $hk => $hEt): ?>
+              <label style="display:inline-block;margin:4px 14px 4px 0"><input type="checkbox" name="heridas[]" value="<?= h($hk) ?>"> <?= h($hEt) ?></label>
+            <?php endforeach; ?>
+          <?php endif; ?>
+          <textarea class="campo" name="desc[<?= h($clave) ?>]" rows="3" maxlength="2000" style="margin-top:8px"
+            placeholder="Describe: <?= h(mb_strtolower($etiqueta)) ?> — qué lo dispara, desde cuándo, a quién involucra…"></textarea>
+        </div>
+      </div>
     <?php endforeach; ?>
-    <label class="etq" for="conflicto_descripcion">Describe el conflicto emocional no resuelto</label>
-    <textarea class="campo" id="conflicto_descripcion" name="conflicto_descripcion" rows="4" maxlength="4000"
-      placeholder="Qué lo dispara, desde cuándo, a quién involucra, qué ha intentado…"></textarea>
 
     <label class="etq" for="plantilla">Plantilla de ejercicios diarios</label>
     <select class="campo" id="plantilla" name="plantilla_id" required>
@@ -273,4 +306,10 @@ paginaInicio('Panel del terapeuta');
   </table>
   <?php endif; ?>
 </div>
+<script>
+document.querySelectorAll('input[data-abre]').forEach(function (cb) {
+  function ver() { var el = document.getElementById(cb.dataset.abre); if (el) el.style.display = cb.checked ? 'block' : 'none'; }
+  cb.addEventListener('change', ver); ver();
+});
+</script>
 <?php paginaFin();
