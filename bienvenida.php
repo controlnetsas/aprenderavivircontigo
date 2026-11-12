@@ -129,7 +129,7 @@ paginaInicio('Bienvenida a tu proceso');
 </div>
 <?php endif; ?>
 <div class="bv bv-login" id="login">
-  <h2>Ya tengo cuenta: iniciar sesión</h2>
+  <h2>Regístrate para iniciar el camino de Aprender a Vivir Contigo</h2>
   <form method="post" action="/login.php">
     <label class="etq" for="l-correo">Correo electrónico*</label>
     <input class="campo" id="l-correo" name="correo" type="email" required autocomplete="username">
@@ -143,7 +143,7 @@ paginaInicio('Bienvenida a tu proceso');
   <p style="margin:0 0 10px">¿Tienes dudas antes de empezar?</p>
   <a class="btn btn-outline-dark" target="_blank" rel="noopener" href="<?= h($wa) ?>">Escríbeme por WhatsApp</a>
 </div>
-<p class="bv-firma">Con cariño, Carlos Andrés Echeverry · Aprender a Vivir Contigo</p>
+<p class="bv-firma">Con cariño, Aprender a Vivir Contigo</p>
 
 <?php if ($destino): ?><div class="bv-barra"><a href="<?= h($destino) ?>">Registrarme y comenzar</a></div><div style="height:50px"></div><?php endif; ?>
 <?php paginaFin();
