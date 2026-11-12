@@ -128,18 +128,20 @@ foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
       </div>
 
     <?php elseif (!$esMiembro): ?>
+      <?php $acabo = ($usuario['estado_membresia'] === 'vencida') || (!empty($usuario['fecha_vencimiento']) && strtotime($usuario['fecha_vencimiento']) < time()); ?>
       <!-- Hay sesión, pero la membresía no está activa (pendiente, vencida o cancelada) -->
-      <div class="card" style="max-width:520px;margin:0 auto;">
+      <div class="card" style="max-width:560px;margin:0 auto;">
         <span class="small-caps eyebrow-gap">Hola, <?= htmlspecialchars(explode(' ', $usuario['nombre'])[0]) ?></span>
-        <h3 class="mt-0">Tu membresía no está activa</h3>
-        <p>
-          <?php if ($usuario['estado_membresia'] === 'vencida'): ?>
-            Tu membresía venció. Renuévala para volver a tener acceso al contenido de valor.
-          <?php else: ?>
-            Aún no tienes una membresía activa. Actívala para desbloquear talleres, libros y descuentos por tiempo limitado.
-          <?php endif; ?>
-        </p>
-        <a href="agenda-te.html#membresia" class="btn btn-primary btn-block">Activar / renovar membresía</a>
+        <?php if ($acabo): ?>
+          <h3 class="mt-0">Tu acceso terminó<?= !empty($usuario['fecha_vencimiento']) ? ' el ' . date('d/m/Y', strtotime($usuario['fecha_vencimiento'])) : '' ?></h3>
+          <p>Gracias por haber hecho parte de este proceso. Para seguir con el contenido del club, puedes comprar tu membresía; y si quieres continuar tu acompañamiento personal, pide una nueva consulta.</p>
+          <a href="agenda-te.html#membresia" class="btn btn-primary btn-block">Comprar mi membresía</a>
+          <a href="https://wa.me/573176435131?text=<?= rawurlencode('Hola Carlos, mi acceso terminó y quiero pedir una nueva consulta.') ?>" target="_blank" rel="noopener" class="btn btn-outline-dark btn-block" style="margin-top:10px;">Pedir una nueva consulta</a>
+        <?php else: ?>
+          <h3 class="mt-0">Tu membresía no está activa</h3>
+          <p>Aún no tienes una membresía activa. Actívala para desbloquear talleres, libros y descuentos por tiempo limitado.</p>
+          <a href="agenda-te.html#membresia" class="btn btn-primary btn-block">Activar membresía</a>
+        <?php endif; ?>
       </div>
 
     <?php else: ?>

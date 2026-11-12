@@ -29,6 +29,8 @@ function construirInformeEvaluacion($pdo, $ev, $usuario) {
   $gen = ultimoResultado($pdo, $uid, 'genealogia');
   $ene = ultimoResultado($pdo, $uid, 'reconocete', 'eneatipo');
   $her = ultimoResultado($pdo, $uid, 'reconocete', 'herida');
+  $vie = ultimoResultado($pdo, $uid, 'vientre');
+  $partes = partesDeEvaluacion($ev);
   $destacados = [];
   $dificultades = [];
 
@@ -66,25 +68,25 @@ function construirInformeEvaluacion($pdo, $ev, $usuario) {
   } else $html .= '<p class="mut">No marcó ninguno.</p>';
 
   // Eneatipo
-  $html .= '<h3>Test de Eneatipos (Reconóce TE)</h3>';
+  if (in_array('eneatipo', $partes, true)) { $html .= '<h3>Test de Eneatipos (Reconóce TE)</h3>';
   if ($ene) {
     $pred = $ene['datos']['predominan'] ?? [];
     $html .= '<p><strong>Predomina:</strong> ' . h($pred ? implode(' / ', $pred) : 'sin patrón claro') . '</p>' . barrasInforme($ene['datos']['categorias'] ?? []);
     $destacados[] = 'Eneatipo: ' . ($pred ? implode(' / ', $pred) : 'sin patrón claro');
     foreach ($pred as $p) $dificultades[] = $p;
-  } else $html .= '<p class="mut">No realizado.</p>';
+  } else $html .= '<p class="mut">No realizado.</p>'; }
 
   // Heridas
-  $html .= '<h3>Test de Heridas de la Infancia (Reconóce TE)</h3>';
+  if (in_array('herida', $partes, true)) { $html .= '<h3>Test de Heridas de la Infancia (Reconóce TE)</h3>';
   if ($her) {
     $pred = $her['datos']['predominan'] ?? [];
     $html .= '<p><strong>Predomina:</strong> ' . h($pred ? implode(' / ', $pred) : 'sin patrón claro') . '</p>' . barrasInforme($her['datos']['categorias'] ?? []);
     $destacados[] = 'Heridas de la infancia: ' . ($pred ? implode(' / ', $pred) : 'sin patrón claro');
     foreach ($pred as $p) $dificultades[] = $p;
-  } else $html .= '<p class="mut">No realizado.</p>';
+  } else $html .= '<p class="mut">No realizado.</p>'; }
 
   // Genealogía
-  $html .= '<h3>Test de Genealogía</h3>';
+  if (in_array('genealogia', $partes, true)) { $html .= '<h3>Test de Genealogía</h3>';
   if ($gen) {
     $temas = $gen['datos']['temas'] ?? [];
     $html .= barrasInforme($temas);
@@ -110,7 +112,18 @@ function construirInformeEvaluacion($pdo, $ev, $usuario) {
       foreach ($si as $r) $html .= '<tr><td>' . h($r['tema'] ?? '') . '<br>' . h($r['pregunta'] ?? '') . '</td><td><strong>' . h($r['respuesta'] ?? '') . '</strong>' . (!empty($r['nota']) ? '<br>' . nl2br(h($r['nota'])) : '') . '</td></tr>';
       $html .= '</table>';
     }
-  } else $html .= '<p class="mut">No realizado.</p>';
+  } else $html .= '<p class="mut">No realizado.</p>'; }
+
+  // Regresando al Vientre
+  if (in_array('vientre', $partes, true)) {
+    $html .= '<h3>Test Regresando al Vientre</h3>';
+    if ($vie) {
+      $pred = $vie['datos']['predominan'] ?? [];
+      $html .= '<p><strong>Mayor carga:</strong> ' . h($pred ? implode(' / ', $pred) : 'sin patrón claro') . '</p>' . barrasInforme($vie['datos']['categorias'] ?? []);
+      $destacados[] = 'Regresando al Vientre: ' . ($pred ? implode(' / ', $pred) : 'sin patrón claro');
+      foreach ($pred as $p) $dificultades[] = $p;
+    } else $html .= '<p class="mut">No realizado.</p>';
+  }
 
   // Síntesis
   $dificultades = array_values(array_unique($dificultades));

@@ -30,7 +30,7 @@ if ($estadoPago === 'Aceptada') {
     $usuarioId = (int)$partes[2];
     $pdo->prepare(
       "UPDATE usuarios SET estado_membresia = 'activa', fecha_inicio_membresia = NOW(),
-       fecha_vencimiento = DATE_ADD(NOW(), INTERVAL 1 MONTH) WHERE id = ?"
+       fecha_vencimiento = DATE_ADD(GREATEST(COALESCE(fecha_vencimiento, NOW()), NOW()), INTERVAL 1 MONTH) WHERE id = ?"
     )->execute([$usuarioId]);
 
   } elseif ($partes[1] === 'CITA' && isset($partes[2])) {

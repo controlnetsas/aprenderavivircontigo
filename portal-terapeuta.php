@@ -33,25 +33,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       $tok = bin2hex(random_bytes(32));
       $expira = ahoraBogota($vig);
-      $pdo->prepare("INSERT INTO enlaces_evaluacion (terapeuta_usuario_id, token, nombre_destino, correo_destino, celular_destino, expira_en, usos_max) VALUES (?,?,?,?,?,?,?)")
-          ->execute([$tid, $tok, $nom ?: null, $mail ?: null, $cel ?: null, $expira, $usos]);
+      $sel = array_values(array_intersect(array_keys(partesEvaluacionCatalogo()), (array)($_POST['tests'] ?? [])));
+      if (!$sel) $sel = ['genealogia', 'eneatipo', 'herida'];
+      $testsCsv = implode(',', $sel);
+      try {
+        $pdo->prepare("INSERT INTO enlaces_evaluacion (terapeuta_usuario_id, token, nombre_destino, correo_destino, celular_destino, expira_en, usos_max, tests) VALUES (?,?,?,?,?,?,?,?)")
+            ->execute([$tid, $tok, $nom ?: null, $mail ?: null, $cel ?: null, $expira, $usos, $testsCsv]);
+      } catch (PDOException $e) { // aún sin migracion-tests-eval.sql: se crea con las tres de siempre
+        $pdo->prepare("INSERT INTO enlaces_evaluacion (terapeuta_usuario_id, token, nombre_destino, correo_destino, celular_destino, expira_en, usos_max) VALUES (?,?,?,?,?,?,?)")
+            ->execute([$tid, $tok, $nom ?: null, $mail ?: null, $cel ?: null, $expira, $usos]);
+      }
+      $nombresTests = implode(', ', array_map(fn($k) => partesEvaluacionCatalogo()[$k], $sel));
       $lnk = SITIO_URL . '/bienvenida.php?t=' . $tok;
       $primer = $nom !== '' ? explode(' ', $nom)[0] : '';
-      $msg = 'Enlace creado: vence ' . textoVence($expira) . '.';
+      $msg = 'Enlace creado (' . $nombresTests . '): vence ' . textoVence($expira) . '.';
       if ($mail !== '' && !empty($_POST['enviar_correo'])) {
         $ok = enviarCorreo($mail, $nom ?: $mail, 'Tu evaluación inicial — Aprender a Vivir Contigo',
           '<h2 style="margin-top:0;">Hola' . ($primer ? ', ' . textoSeguro($primer) : '') . '</h2>'
           . '<p>Gracias por pedir tu terapia: dar este paso es un acto de valentía. Entra con el botón: ahí te doy la bienvenida y te cuento cómo será el proceso. Para prepararlo, necesito que completes tu evaluación inicial:</p>'
           . '<ol><li><strong>Crea tu cuenta</strong> (nombre completo, correo, celular y contraseña).</li>'
           . '<li><strong>Confirma tu correo</strong> con el mensaje que te llegará.</li>'
-          . '<li><strong>Llena tu ficha</strong> y <strong>haz los tres tests</strong>: genealogía, eneatipos y heridas de la infancia.</li></ol>'
+          . '<li><strong>Llena tu ficha</strong> y <strong>haz tus tests</strong>: ' . textoSeguro($nombresTests) . '.</li></ol>'
           . '<p>Puedes hacerlo a tu ritmo; lo que respondas solo lo veo yo.</p>'
           . botonCorreo($lnk, 'Leer mi bienvenida y empezar')
           . '<p style="font-size:13px;color:#6b6480">Este enlace es personal y vence el ' . date('d/m/Y \a \l\a\s H:i', strtotime($expira)) . '.</p>');
         $msg .= $ok ? ' Correo enviado a ' . $mail . '.' : ' No se pudo enviar el correo: envía el enlace por WhatsApp.';
       }
       $_SESSION['flash'] = ['ok', $msg];
-      $_SESSION['flash_nuevo'] = ['lnk' => $lnk, 'nombre' => $nom, 'cel' => $cel, 'expira' => $expira];
+      $_SESSION['flash_nuevo'] = ['lnk' => $lnk, 'nombre' => $nom, 'cel' => $cel, 'expira' => $expira, 'tests' => $nombresTests];
     }
   } elseif ($accion === 'revocar') {
     $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 0 WHERE id = ? AND terapeuta_usuario_id = ?")->execute([(int)($_POST['id'] ?? 0), $tid]);
@@ -71,7 +80,7 @@ $q = $pdo->prepare("SELECT * FROM enlaces_evaluacion WHERE terapeuta_usuario_id 
 $q->execute([$tid]); $enlaces = $q->fetchAll(PDO::FETCH_ASSOC);
 
 // Evaluaciones
-$l = $pdo->prepare("SELECT e.id, e.estado, e.creado_en, e.completada_en, u.nombre, u.email, u.telefono, u.email_verificado
+$l = $pdo->prepare("SELECT e.id, e.estado, e.creado_en, e.completada_en, u.nombre, u.email, u.telefono, u.email_verificado, u.fecha_vencimiento
                     FROM evaluaciones e JOIN usuarios u ON u.id = e.usuario_id WHERE e.terapeuta_usuario_id = ? ORDER BY e.id DESC LIMIT 200");
 $l->execute([$tid]); $lista = $l->fetchAll(PDO::FETCH_ASSOC);
 $tot = count($lista); $comp = 0; $curso = 0; $sinConf = 0;
@@ -95,6 +104,11 @@ paginaInicio('Portal del terapeuta');
 .est{display:inline-block;border-radius:20px;padding:3px 12px;font-size:13px;font-family:Poppins,Arial,sans-serif;font-weight:600}
 .e-activo{background:#dff5e5;color:#17663a}.e-vencido{background:#fde8e8;color:#8a1f1f}.e-usado{background:#fff1cf;color:#8a5a00}.e-revocado{background:#e8e5ef;color:#4a4360}
 .tabla td,.tabla th{vertical-align:top}
+.tchip{cursor:pointer;display:inline-block}
+.tchip input{position:absolute;opacity:0;pointer-events:none}
+.tchip span{display:inline-block;border:2px solid #d9cfe6;background:#fff;color:#211A33;border-radius:30px;padding:10px 20px;font-family:Poppins,Arial,sans-serif;font-weight:600;font-size:15px;transition:.15s}
+.tchip.on span{background:#211A33;border-color:#211A33;color:#F5C343}
+.tchip input:focus-visible + span{outline:3px solid #F5C343}
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 
@@ -113,7 +127,7 @@ paginaInicio('Portal del terapeuta');
 
 <?php if ($flash) echo aviso($flash[0], h($flash[1])); ?>
 
-<?php if ($nuevo): $txt = ($nuevo['nombre'] ? 'Hola ' . explode(' ', $nuevo['nombre'])[0] . ', ' : 'Hola, ') . "soy Carlos de Aprender a Vivir Contigo. Para tu proceso, entra a este enlace personal, crea tu cuenta y llena tu evaluación inicial (una ficha y tres tests). El enlace vence el " . date('d/m/Y H:i', strtotime($nuevo['expira'])) . ":\n" . $nuevo['lnk']; ?>
+<?php if ($nuevo): $txt = ($nuevo['nombre'] ? 'Hola ' . explode(' ', $nuevo['nombre'])[0] . ', ' : 'Hola, ') . "soy Carlos de Aprender a Vivir Contigo. Para tu proceso, entra a este enlace personal, crea tu cuenta y llena tu evaluación inicial (una ficha y estos tests: " . ($nuevo['tests'] ?? '') . "). El enlace vence el " . date('d/m/Y H:i', strtotime($nuevo['expira'])) . ":\n" . $nuevo['lnk']; ?>
 <div class="card" style="margin-bottom:16px;border:2px solid #F5C343;background:#fffbea">
   <h2 style="margin-top:0">Tu enlace está listo</h2>
   <input class="campo" id="nuevo-enlace" readonly value="<?= h($nuevo['lnk']) ?>" onclick="this.select()">
@@ -134,6 +148,15 @@ paginaInicio('Portal del terapeuta');
       <div style="flex:1;min-width:200px"><label class="etq" for="n-mail">Correo (opcional)</label><input class="campo" id="n-mail" name="correo" type="email" maxlength="190"></div>
       <div style="flex:1;min-width:160px"><label class="etq" for="n-cel">Celular (opcional)</label><input class="campo" id="n-cel" name="celular" type="tel" maxlength="30"></div>
     </div>
+    <div style="margin-top:12px">
+      <span class="etq">Tests que enviarás (toca para elegir)</span>
+      <div class="fila" id="chips-tests" style="gap:10px;margin-top:6px">
+        <?php foreach (partesEvaluacionCatalogo() as $k => $t): $on = in_array($k, ['genealogia', 'eneatipo', 'herida'], true); ?>
+          <label class="tchip<?= $on ? ' on' : '' ?>"><input type="checkbox" name="tests[]" value="<?= h($k) ?>"<?= $on ? ' checked' : '' ?>><span><?= h($t) ?></span></label>
+        <?php endforeach; ?>
+      </div>
+      <p class="mut" style="margin:6px 0 0;font-size:13px">La persona solo verá y hará los tests que elijas aquí. La ficha siempre va incluida.</p>
+    </div>
     <div class="fila" style="margin-top:8px">
       <div style="flex:1;min-width:180px"><label class="etq" for="n-vig">El enlace vence en</label>
         <select class="campo" id="n-vig" name="vigencia"><?php foreach ($VIGENCIAS as $v => $t): ?><option value="<?= h($v) ?>"<?= $v === '+3 days' ? ' selected' : '' ?>><?= h($t) ?></option><?php endforeach; ?></select></div>
@@ -149,13 +172,14 @@ paginaInicio('Portal del terapeuta');
   <h2 style="margin-top:0">Evaluaciones recibidas</h2>
   <?php if (!$lista): ?><p class="mut">Aún no hay evaluaciones. Cuando alguien se registre con tu enlace, aparecerá aquí.</p><?php else: ?>
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="tabla" style="min-width:560px">
-    <tr><th>Persona</th><th>Estado</th><th>Fecha</th><th></th></tr>
+    <tr><th>Persona</th><th>Estado</th><th>Fecha</th><th>Acceso al club</th><th></th></tr>
     <?php foreach ($lista as $r):
       $estado = $r['estado'] === 'completada' ? 'Completada' : ((int)$r['email_verificado'] !== 1 ? 'Correo sin confirmar' : ($r['estado'] === 'en_curso' ? 'En curso' : 'Registrada')); ?>
     <tr>
       <td><strong><?= h($r['nombre']) ?></strong><br><span class="mut"><?= h($r['email']) ?> · <?= h($r['telefono']) ?></span></td>
       <td><span class="chip"><?= h($estado) ?></span></td>
       <td class="mut"><?= h(substr((string)($r['completada_en'] ?: $r['creado_en']), 0, 10)) ?></td>
+      <td class="mut"><?= !empty($r['fecha_vencimiento']) ? (strtotime($r['fecha_vencimiento']) >= time() ? 'hasta ' : 'terminó ') . h(date('d/m/Y', strtotime($r['fecha_vencimiento']))) : '—' ?></td>
       <td><a class="btn btn-primary" href="/consultante.php?id=<?= (int)$r['id'] ?>">Ver consultante</a>
         <?php if ($r['estado'] === 'completada'): ?> <a class="btn btn-outline-dark" href="/informe.php?id=<?= (int)$r['id'] ?>">Informe</a><?php endif; ?></td>
     </tr>
@@ -168,11 +192,12 @@ paginaInicio('Portal del terapeuta');
   <h2 style="margin-top:0">Enlaces enviados</h2>
   <?php if (!$enlaces): ?><p class="mut">Aún no has creado enlaces.</p><?php else: ?>
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="tabla" style="min-width:560px">
-    <tr><th>Para</th><th>Estado</th><th>Vence</th><th>Usos</th><th></th></tr>
+    <tr><th>Para</th><th>Tests</th><th>Estado</th><th>Vence</th><th>Usos</th><th></th></tr>
     <?php foreach ($enlaces as $e): $st = estadoEnlace($e); ?>
     <tr>
       <td><?= $e['nombre_destino'] || $e['correo_destino'] ? '<strong>' . h($e['nombre_destino'] ?: $e['correo_destino']) . '</strong>' . ($e['nombre_destino'] && $e['correo_destino'] ? '<br><span class="mut">' . h($e['correo_destino']) . '</span>' : '') : '<span class="mut">Enlace sin destinatario</span>' ?>
         <br><span class="mut" style="font-size:13px">Creado <?= h(date('d/m H:i', strtotime($e['creado_en']))) ?></span></td>
+      <td class="mut" style="font-size:13px"><?= h(implode(', ', array_map(fn($k) => partesEvaluacionCatalogo()[$k], partesDeEvaluacion($e)))) ?></td>
       <td><span class="est e-<?= h($st) ?>"><?= h(ucfirst($st)) ?></span></td>
       <td class="mut"><?= h(textoVence($e['expira_en'])) ?></td>
       <td class="mut"><?= (int)$e['usos'] ?> / <?= (int)$e['usos_max'] ?></td>
@@ -193,4 +218,13 @@ paginaInicio('Portal del terapeuta');
   </table></div>
   <?php endif; ?>
 </div>
+<script>
+document.querySelectorAll('#chips-tests .tchip').forEach(function (l) {
+  var c = l.querySelector('input');
+  c.addEventListener('change', function () { l.classList.toggle('on', c.checked); });
+});
+document.querySelector('#chips-tests').closest('form').addEventListener('submit', function (e) {
+  if (!this.querySelector('#chips-tests input:checked')) { e.preventDefault(); alert('Elige al menos un test.'); }
+});
+</script>
 <?php paginaFin();

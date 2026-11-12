@@ -24,8 +24,8 @@ if ($usuario) {
   if (!evaluacionDeUsuario($pdo, $usuario['id']) && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['comenzar'])) {
     verificaCsrf();
     if (consumirEnlace($pdo, $enlace['id'])) {
-      $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
-          ->execute([$usuario['id'], $enlace['terapeuta_usuario_id'], $enlace['id']]);
+      crearEvaluacion($pdo, $usuario['id'], $enlace);
+      otorgarAccesoConsultante($pdo, $usuario['id']);
     }
   }
   if (evaluacionDeUsuario($pdo, $usuario['id'])) { header('Location: /mi-evaluacion.php'); exit; }
@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ->execute([$nombre, $email, $celular, password_hash($password, PASSWORD_DEFAULT), $tokenVer]);
         $uid = (int)$pdo->lastInsertId();
         if (!consumirEnlace($pdo, $enlace['id'])) throw new RuntimeException('enlace agotado');
-        $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
-            ->execute([$uid, $enlace['terapeuta_usuario_id'], $enlace['id']]);
+        crearEvaluacion($pdo, $uid, $enlace);
+        otorgarAccesoConsultante($pdo, $uid);
         $pdo->commit();
       } catch (Throwable $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();

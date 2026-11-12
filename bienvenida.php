@@ -108,6 +108,7 @@ paginaInicio('Bienvenida a tu proceso');
 <div class="bv bv-reg" id="registro">
   <h2>Regístrate para iniciar el camino de Aprender a Vivir Contigo</h2>
   <p style="font-size:18px">Crea tu cuenta. Te toma un par de minutos.</p>
+  <?php if ($destino): ?><p style="font-size:16px;margin:4px 0 0">Al registrarte tienes <strong>3 meses de acceso</strong> al Club de Membresía.</p><?php endif; ?>
   <?php if ($err): ?>
   <div style="background:#fde8e8;color:#8a1f1f;border-radius:14px;padding:14px 18px;max-width:560px;margin:14px auto 0;text-align:left;font-size:16px">
     <?php if ($err === 'correo-existente'): ?>Ese correo <strong>ya tiene una cuenta</strong>. <a href="/login.html<?= $destino ? '?next=' . h(urlencode($destino)) : '' ?>" style="color:#8a1f1f;font-weight:700;text-decoration:underline">Inicia sesión aquí</a> o <a href="/olvide-clave.php" style="color:#8a1f1f;text-decoration:underline">recupera tu contraseña</a>.

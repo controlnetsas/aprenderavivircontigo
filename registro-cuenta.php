@@ -54,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $uid = (int)$pdo->lastInsertId();
       if ($enlace) {
         if (!consumirEnlace($pdo, $enlace['id'])) throw new RuntimeException('enlace agotado');
-        $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
-            ->execute([$uid, $enlace['terapeuta_usuario_id'], $enlace['id']]);
+        crearEvaluacion($pdo, $uid, $enlace);
+        otorgarAccesoConsultante($pdo, $uid); // 3 meses de membresía por registrarse con el enlace
       }
       $pdo->commit();
     } catch (Throwable $e) {

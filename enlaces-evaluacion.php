@@ -45,3 +45,32 @@ function textoVence($expira) {
   if ($dif < 86400) return 'en ' . (int)floor($dif / 3600) . ' h (' . date('d/m H:i', strtotime($expira)) . ')';
   return 'en ' . (int)floor($dif / 86400) . ' d (' . date('d/m H:i', strtotime($expira)) . ')';
 }
+
+// Regla: quien se registra con un enlace del terapeuta recibe acceso al Club de Membresía por este número de meses.
+// Pasado ese tiempo, la membresía vence sola (sesion.php/esMiembroActivo) y se le invita a comprarla o a pedir una consulta.
+if (!defined('MESES_ACCESO_CONSULTANTE')) define('MESES_ACCESO_CONSULTANTE', 3);
+
+function otorgarAccesoConsultante($pdo, $usuarioId) {
+  $hasta = date('Y-m-d', strtotime(ahoraBogota('+' . MESES_ACCESO_CONSULTANTE . ' months'))) . ' 23:59:59';
+  $u = $pdo->prepare("SELECT estado_membresia, fecha_vencimiento FROM usuarios WHERE id = ?");
+  $u->execute([$usuarioId]);
+  $f = $u->fetch(PDO::FETCH_ASSOC);
+  if (!$f) return;
+  // Si ya tiene una membresía activa que dura más, no se le acorta.
+  if ($f['estado_membresia'] === 'activa' && !empty($f['fecha_vencimiento']) && $f['fecha_vencimiento'] >= $hasta) return;
+  $pdo->prepare("UPDATE usuarios SET estado_membresia = 'activa', fecha_inicio_membresia = ?, fecha_vencimiento = ? WHERE id = ?")
+      ->execute([ahoraBogota(), $hasta, $usuarioId]);
+}
+
+// Crea la evaluación de una persona con los tests que el terapeuta eligió en el enlace.
+function crearEvaluacion($pdo, $usuarioId, $enlace) {
+  $tests = !empty($enlace['tests']) ? $enlace['tests'] : 'genealogia,eneatipo,herida';
+  try {
+    $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en, tests) VALUES (?,?,?,NOW(),?)")
+        ->execute([$usuarioId, $enlace['terapeuta_usuario_id'], $enlace['id'], $tests]);
+  } catch (PDOException $e) {
+    // Si aún no se corrió migracion-tests-eval.sql, se crea sin la columna `tests` (quedan las tres de siempre).
+    $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
+        ->execute([$usuarioId, $enlace['terapeuta_usuario_id'], $enlace['id']]);
+  }
+}

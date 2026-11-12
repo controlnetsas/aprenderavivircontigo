@@ -180,6 +180,21 @@ function testsCatalogo() {
   ];
 }
 
+// Partes que el terapeuta puede elegir para una evaluación inicial.
+function partesEvaluacionCatalogo() {
+  return ['genealogia' => 'Genealogía', 'eneatipo' => 'Eneatipos', 'herida' => 'Heridas de la infancia', 'vientre' => 'Regresando al Vientre'];
+}
+// Partes elegidas (de un enlace o de una evaluación). Si no hay dato, las tres de siempre.
+function partesDeEvaluacion($fila) {
+  $validas = array_keys(partesEvaluacionCatalogo());
+  $out = [];
+  foreach (explode(',', (string)($fila['tests'] ?? '')) as $t) { $t = trim($t); if (in_array($t, $validas, true)) $out[] = $t; }
+  $out = array_values(array_unique($out));
+  return $out ?: ['genealogia', 'eneatipo', 'herida'];
+}
+// Test (página) que corresponde a cada parte.
+function testDeParte($parte) { return ($parte === 'eneatipo' || $parte === 'herida') ? 'reconocete' : $parte; }
+
 function testsDeConsulta($csv) {
   $validos = array_keys(testsCatalogo());
   $out = [];
@@ -193,7 +208,9 @@ function testsPermitidos($pdo, $usuario) {
   if (!$usuario) return [];
   if (($usuario['rol'] ?? '') === 'terapeuta' || esMiembroActivo($usuario)) return $todos;
   $ok = [];
-  if (evaluacionDeUsuario($pdo, $usuario['id'])) $ok = ['genealogia', 'reconocete'];
+  if ($evalU = evaluacionDeUsuario($pdo, $usuario['id'])) {
+    foreach (partesDeEvaluacion($evalU) as $pt) $ok[] = testDeParte($pt);
+  }
   foreach (consultasDeUsuario($pdo, $usuario) as $c) {
     if (($c['estado'] ?? '') === 'finalizada') continue;
     $ok = array_merge($ok, testsDeConsulta($c['tests_asignados'] ?? ''));
@@ -237,12 +254,13 @@ function evaluacionDeUsuario($pdo, $usuarioId) {
 
 // ¿Ya guardó cada parte de los tests de la evaluación? (genealogía, eneatipo, heridas)
 function avanceTestsEvaluacion($pdo, $usuarioId) {
-  $out = ['genealogia' => false, 'eneatipo' => false, 'herida' => false];
+  $out = ['genealogia' => false, 'eneatipo' => false, 'herida' => false, 'vientre' => false];
   try {
     $s = $pdo->prepare("SELECT test, datos FROM resultados_tests WHERE usuario_id = ?");
     $s->execute([$usuarioId]);
     foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $r) {
       if ($r['test'] === 'genealogia') $out['genealogia'] = true;
+      if ($r['test'] === 'vientre') $out['vientre'] = true;
       if ($r['test'] === 'reconocete') {
         if (strpos((string)$r['datos'], '"parte":"eneatipo"') !== false) $out['eneatipo'] = true;
         if (strpos((string)$r['datos'], '"parte":"herida"') !== false) $out['herida'] = true;
