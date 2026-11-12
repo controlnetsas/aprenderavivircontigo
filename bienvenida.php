@@ -36,17 +36,17 @@ paginaInicio('Bienvenida a tu proceso');
 .bv-reg .btn-primary{background:#211A33;color:#fff;font-size:19px;padding:17px 34px}.bv-form .btn-primary{font-size:18px;padding:16px;justify-content:center;text-align:center}
 .bv-reg .btn-outline-dark{background:rgba(255,255,255,.6)}
 .bv-reg .mut{color:#211A33;opacity:.8;font-size:14px}
-.bv-login{background:#fff;max-width:460px;margin:0 auto 16px;box-shadow:0 6px 24px rgba(33,26,51,.08)}.bv-login .etq{display:block;font-size:13px;font-weight:600;margin:12px 0 3px}.bv-login .btn-primary{background:#F5C343;color:#211A33;font-size:17px;padding:14px}
-.bv-wa{background:#e9f8ef;text-align:center;max-width:460px;margin:0 auto 16px;padding:18px 22px}.bv-wa .btn{background:#fff;border:2px solid #25D366;color:#211A33}
+.bv-login{background:#fff;max-width:560px;width:100%;box-sizing:border-box;padding:20px 22px;margin:0 auto 16px;box-shadow:0 6px 24px rgba(33,26,51,.08)}.bv-login .etq{display:block;font-size:13px;font-weight:600;margin:12px 0 3px}.bv-login .btn-primary{background:#F5C343;color:#211A33;font-size:17px;padding:14px}
+.bv-wa{background:#e9f8ef;text-align:center;max-width:560px;margin:0 auto 16px;padding:18px 22px}.bv-wa .btn{background:#fff;border:2px solid #25D366;color:#211A33}
 .bv-firma{text-align:center;color:#6b6480;font-size:14px;margin-top:6px}
 .bv-barra{position:fixed;left:0;right:0;bottom:0;background:#211A33;padding:10px 16px;text-align:center;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
 .bv-barra a{display:inline-block;background:#F5C343;color:#211A33;font-family:Poppins,Arial,sans-serif;font-weight:600;border-radius:30px;padding:11px 26px;text-decoration:none}
-.bv-form{display:block;background:#fff;border-radius:16px;padding:20px 22px;text-align:left;margin:16px auto 0;max-width:560px;box-shadow:0 6px 20px rgba(33,26,51,.15)}
+.bv-form{display:block;background:#fff;border-radius:16px;padding:20px 22px;text-align:left;margin:16px auto 0;max-width:560px;width:100%;box-sizing:border-box;box-shadow:0 6px 20px rgba(33,26,51,.15)}
 .bv-form .etq{display:block;font-size:13px;font-weight:600;margin:10px 0 3px;color:#211A33}
 .bv-form .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 .bv-form .mut{color:#6b6480;opacity:1;font-size:13px}
 @media(min-width:900px){.bv-barra{display:none}}
-@media(max-width:600px){.bv-form .g2{grid-template-columns:1fr}.bv-hero h1{font-size:1.6rem}.pasos4{grid-template-columns:1fr}}
+@media(max-width:600px){.bv-login,.bv-wa{margin-left:22px;margin-right:22px;width:auto}.bv-form .g2{grid-template-columns:1fr}.bv-hero h1{font-size:1.6rem}.pasos4{grid-template-columns:1fr}}
 </style>
 
 <div class="bv bv-hero">
@@ -118,7 +118,7 @@ paginaInicio('Bienvenida a tu proceso');
       <span class="mut"><?= h(TEXTO_CONSENTIMIENTO_EVAL) ?></span>
     </label>
     <?php else: ?><div style="height:14px"></div><?php endif; ?>
-    <button class="btn btn-primary btn-block" type="submit" style="width:100%">Crear mi cuenta</button>
+    <button class="btn btn-primary btn-block" type="submit" style="width:100%;flex-direction:column;line-height:1.3;white-space:normal;border-radius:28px;padding:14px 16px">Crear mi cuenta<small style="display:block;font-weight:500;font-size:12px;margin-top:3px;text-align:center">¡Después de este click vendrán muchos cambios!</small></button>
     <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
   </form>
   <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
@@ -130,7 +130,7 @@ paginaInicio('Bienvenida a tu proceso');
     <input class="campo" id="l-correo" name="correo" type="email" required autocomplete="username">
     <label class="etq" for="l-pass">Contraseña*</label>
     <input class="campo" id="l-pass" name="password" type="password" required minlength="8" autocomplete="current-password">
-    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px;justify-content:center;text-align:center;flex-direction:column;line-height:1.3">Ingresar<small style="display:block;font-weight:500;font-size:12px;margin-top:3px">¡Después de este click vendrán muchos cambios!</small></button>
+    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px;justify-content:center;text-align:center">Ingresar</button>
   </form>
   <p style="text-align:center;font-size:14px;margin:14px 0 0"><a href="/olvide-clave.php" style="color:#C2607D;text-decoration:underline">¿Olvidaste tu contraseña?</a></p>
 </div>
