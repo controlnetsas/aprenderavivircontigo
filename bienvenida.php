@@ -100,13 +100,15 @@ paginaInicio('Bienvenida a tu proceso');
   <p style="font-size:18px">Crea tu cuenta. Te toma un par de minutos.</p>
   <?php if ($err): ?>
   <div style="background:#fde8e8;color:#8a1f1f;border-radius:14px;padding:14px 18px;max-width:560px;margin:14px auto 0;text-align:left;font-size:16px">
-    <?php if ($err === 'correo-existente'): ?>Ese correo <strong>ya tiene una cuenta</strong>. <a href="/login.html" style="color:#8a1f1f;font-weight:700;text-decoration:underline">Inicia sesión aquí</a> o <a href="/olvide-clave.php" style="color:#8a1f1f;text-decoration:underline">recupera tu contraseña</a>.
+    <?php if ($err === 'correo-existente'): ?>Ese correo <strong>ya tiene una cuenta</strong>. <a href="/login.html<?= $destino ? '?next=' . h(urlencode($destino)) : '' ?>" style="color:#8a1f1f;font-weight:700;text-decoration:underline">Inicia sesión aquí</a> o <a href="/olvide-clave.php" style="color:#8a1f1f;text-decoration:underline">recupera tu contraseña</a>.
     <?php elseif ($err === 'clave'): ?>Las contraseñas no coinciden. Vuelve a escribirlas.
+    <?php elseif ($err === 'datos'): ?>Revisa tus datos: nombre y apellido, celular de al menos 10 dígitos y acepta el uso de tus datos.
+    <?php elseif ($err === 'enlace'): ?>Este enlace ya no es válido. Pídele uno nuevo a tu terapeuta.
     <?php else: ?>No pudimos crear tu cuenta. Revisa tus datos e inténtalo de nuevo.<?php endif; ?>
   </div>
   <?php endif; ?>
-  <form class="bv-form" method="post" action="<?= $destino ? '/evaluacion.php' : '/registro-cuenta.php' ?>" autocomplete="off">
-    <?php if ($destino): ?><input type="hidden" name="t" value="<?= h($token) ?>"><?php else: ?><input type="hidden" name="origen" value="bienvenida"><?php endif; ?>
+  <form class="bv-form" method="post" action="/registro-cuenta.php" autocomplete="off">
+    <input type="hidden" name="origen" value="bienvenida"><?php if ($destino): ?><input type="hidden" name="t" value="<?= h($token) ?>"><?php endif; ?>
     <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="sitio_web" tabindex="-1" autocomplete="off"></div>
     <label class="etq" for="b-nombre">Nombre completo*</label>
     <input class="campo" id="b-nombre" name="nombre" required maxlength="150">
@@ -114,7 +116,7 @@ paginaInicio('Bienvenida a tu proceso');
       <div><label class="etq" for="b-correo">Correo electrónico*</label>
       <input class="campo" id="b-correo" name="correo" type="email" required maxlength="190"></div>
       <div><label class="etq" for="b-cel">Número de celular*</label>
-      <input class="campo" id="b-cel" name="<?= $destino ? 'celular' : 'whatsapp' ?>" type="tel" required maxlength="30" placeholder="3001234567"></div>
+      <input class="campo" id="b-cel" name="whatsapp" type="tel" required maxlength="30" placeholder="3001234567"></div>
       <div><label class="etq" for="b-p1">Contraseña* (mín. 8)</label>
       <input class="campo" id="b-p1" name="password" type="password" minlength="8" required autocomplete="new-password"></div>
       <div><label class="etq" for="b-p2">Confirma tu contraseña*</label>

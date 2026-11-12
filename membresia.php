@@ -5,6 +5,15 @@ require_once __DIR__ . '/sesion.php';
 $usuario = usuarioActual(); // null si no hay sesión iniciada
 $esMiembro = esMiembroActivo($usuario);
 
+// Evaluación inicial del terapeuta (si la persona se registró con su enlace)
+$evaluacion = null;
+if ($usuario) {
+  try {
+    require_once __DIR__ . '/camino-nucleo.php';
+    $evaluacion = evaluacionDeUsuario(conexionDB(), $usuario['id']);
+  } catch (Throwable $e) { $evaluacion = null; }
+}
+
 $contenido = [];
 if ($esMiembro) {
   $pdo = conexionDB();
@@ -86,6 +95,25 @@ foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
     <a class="btn btn-primary" href="/terapeuta.php">Panel del terapeuta</a>
   <?php endif; ?>
 </div>
+
+<?php if ($usuario && $evaluacion): $evPend = ($evaluacion['estado'] ?? '') !== 'completada'; ?>
+<section style="padding-bottom:0">
+  <div class="container">
+    <div class="card" style="max-width:720px;margin:0 auto;border:2px solid #F5C343;background:linear-gradient(135deg,#FFF6D9,#FFF3F6);text-align:center;">
+      <span class="small-caps eyebrow-gap"><?= $evPend ? 'Tu primer paso' : 'Evaluación enviada' ?></span>
+      <?php if ($evPend): ?>
+        <h3 class="mt-0">Tu evaluación inicial te espera</h3>
+        <p>Llena tu ficha y haz tus tests. Puedes pausar y continuar cuando quieras. Al terminar, tu terapeuta recibe tu informe.</p>
+        <a href="/mi-evaluacion.php" class="btn btn-primary" style="font-size:1.1rem;padding:14px 30px;">Continuar mi evaluación</a>
+      <?php else: ?>
+        <h3 class="mt-0">Tu evaluación ya fue enviada</h3>
+        <p>Tu terapeuta ya tiene tu informe. Puedes revisar tus resultados cuando quieras.</p>
+        <a href="/mi-evaluacion.php" class="btn btn-outline-dark">Ver mi evaluación</a>
+      <?php endif; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
 
 <section>
   <div class="container">

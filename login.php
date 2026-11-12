@@ -17,12 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (session_status() === PHP_SESSION_NONE) session_start();
     $_SESSION['usuario_id'] = $usuario['id'];
     $destino = '/membresia.php';
-    try {
-      $ev = conexionDB()->prepare("SELECT estado FROM evaluaciones WHERE usuario_id = ?");
-      $ev->execute([$usuario['id']]);
-      $estadoEv = $ev->fetchColumn();
-      if ($estadoEv !== false && $estadoEv !== 'completada') $destino = '/mi-evaluacion.php';
-    } catch (Throwable $e) { /* sin tabla de evaluaciones */ }
     // Si venía de un enlace de evaluación, regresa ahí (solo se acepta ese formato exacto).
     $next = $_POST['next'] ?? '';
     if (is_string($next) && preg_match('#^/evaluacion\.php\?t=[a-f0-9]{64}$#', $next)) $destino = $next;
