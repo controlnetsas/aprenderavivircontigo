@@ -64,8 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['flash_nuevo'] = ['lnk' => $lnk, 'nombre' => $nom, 'cel' => $cel, 'expira' => $expira, 'tests' => $nombresTests];
     }
   } elseif ($accion === 'revocar') {
-    $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 0 WHERE id = ?")->execute([(int)($_POST['id'] ?? 0)]);
-    $_SESSION['flash'] = ['ok', 'Enlace desactivado: ya no funciona.'];
+    $idRev = (int)($_POST['id'] ?? 0);
+    // Se desactiva y desaparece de la lista; si nadie lo usó, se borra del todo.
+    $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 0 WHERE id = ?")->execute([$idRev]);
+    try { $pdo->prepare("DELETE FROM enlaces_evaluacion WHERE id = ? AND usos = 0")->execute([$idRev]); } catch (Throwable $e) { error_log('borrar enlace: ' . $e->getMessage()); }
+    $_SESSION['flash'] = ['ok', 'Enlace desactivado y eliminado de la lista: ya no funciona.'];
   } elseif ($accion === 'extender') {
     $pdo->prepare("UPDATE enlaces_evaluacion SET activo = 1, expira_en = ? WHERE id = ? AND usos < usos_max")
         ->execute([ahoraBogota('+3 days'), (int)($_POST['id'] ?? 0)]);
@@ -77,7 +80,8 @@ $flash = $_SESSION['flash'] ?? null; $nuevo = $_SESSION['flash_nuevo'] ?? null;
 unset($_SESSION['flash'], $_SESSION['flash_nuevo']);
 
 // Enlaces recientes
-$q = $pdo->prepare("SELECT * FROM enlaces_evaluacion ORDER BY id DESC LIMIT 30");
+try { $pdo->exec("DELETE FROM enlaces_evaluacion WHERE activo = 0 AND usos = 0"); } catch (Throwable $e) { error_log('limpiar enlaces: ' . $e->getMessage()); } // limpia los desactivados de antes
+$q = $pdo->prepare("SELECT * FROM enlaces_evaluacion WHERE activo = 1 ORDER BY id DESC LIMIT 30");
 $q->execute(); $enlaces = $q->fetchAll(PDO::FETCH_ASSOC);
 
 // Evaluaciones
