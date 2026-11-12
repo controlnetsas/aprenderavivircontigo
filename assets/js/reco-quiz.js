@@ -280,6 +280,17 @@
       });
 
       if (config.onFinish) config.onFinish(r, top);
+      // Aviso para las páginas privadas: permite ofrecer "Guardar mi resultado" (ver guardar-test.js).
+      if (window.AVC_ON_TEST_FINISH) {
+        try {
+          window.AVC_ON_TEST_FINISH(config.tipo, {
+            categorias: config.categorias.map(function (cat, i) {
+              return { nombre: config.nombreCategoria(cat), si: r.conteo[i], total: r.total[i] };
+            }),
+            predominan: top.map(function (t) { return config.nombreCategoria(t.cat); })
+          });
+        } catch (e) { /* el test sigue funcionando aunque falle el guardado */ }
+      }
     }
 
     render();

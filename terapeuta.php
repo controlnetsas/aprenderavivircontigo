@@ -59,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $notas = trim($_POST['notas_privadas'] ?? '');
     $msgTer = trim($_POST['mensaje_terapeuta'] ?? '');
     $talleres = array_values(array_intersect(array_keys($catalogo), (array)($_POST['talleres'] ?? [])));
+    $testsSel = array_values(array_intersect(array_keys(testsCatalogo()), (array)($_POST['tests'] ?? [])));
 
     $okFecha = preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha) === 1;
     $plantillaValida = in_array($plantillaId, array_column($plantillas, 'id'), true);
@@ -72,16 +73,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         "INSERT INTO consultas (terapeuta_usuario_id, nombre, email, whatsapp, fecha_consulta, notas_privadas,
            mensaje_terapeuta, plantilla_id, talleres_recomendados, token, token_expira,
            edad, sexo, sintomas, situacion_sentimental, hijos, hijos_no_nacidos, estado_salud, trabajo_actual, profesion,
-           conflictos_emocionales, conflicto_descripcion, heridas_infancia)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?, ?,?,?)"
+           conflictos_emocionales, conflicto_descripcion, heridas_infancia, tests_asignados)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?, ?,?,?,?)"
       );
       $ins->execute([$terapeuta['id'], $nombre, $email, $whatsapp ?: null, $fecha, $notas ?: null,
         $msgTer ?: null, $plantillaId, implode(',', $talleres) ?: null, $token, $expira,
         $edad, $sexo, $sintomas, $situacion, $hijos, $hijosNoNac, $estadoSalud, $trabajo, $profesion,
-        implode(',', $conflictos) ?: null, $conflictoDesc, implode(',', $heridas) ?: null]);
+        implode(',', $conflictos) ?: null, $conflictoDesc, implode(',', $heridas) ?: null, implode(',', $testsSel) ?: null]);
       $nueva = ['id' => (int)$pdo->lastInsertId(), 'nombre' => $nombre, 'email' => $email,
                 'whatsapp' => $whatsapp, 'token' => $token];
     }
+  }
+
+  if ($accion === 'tests') {
+    $id = (int)($_POST['consulta_id'] ?? 0);
+    $sel = array_values(array_intersect(array_keys(testsCatalogo()), (array)($_POST['tests'] ?? [])));
+    $pdo->prepare("UPDATE consultas SET tests_asignados = ? WHERE id = ? AND terapeuta_usuario_id = ?")
+        ->execute([implode(',', $sel) ?: null, $id, $terapeuta['id']]);
+    header('Location: /terapeuta.php?ver=' . $id . '&tests=ok');
+    exit;
   }
 
   if ($accion === 'reenviar') {
@@ -184,6 +194,47 @@ paginaInicio('Panel del terapeuta');
       <tr><th style="width:38%"><?= h($k) ?></th><td><?= ($v === null || $v === '') ? '<span class="mut">—</span>' : nl2br(h($v)) ?></td></tr>
     <?php endforeach; ?>
   </table>
+  <h3>Tests</h3>
+  <?php if (!empty($_GET['tests'])) echo aviso('ok', 'Tests actualizados.'); ?>
+  <form method="post">
+    <input type="hidden" name="csrf" value="<?= h(tokenCsrf()) ?>">
+    <input type="hidden" name="accion" value="tests"><input type="hidden" name="consulta_id" value="<?= (int)$ficha['id'] ?>">
+    <?php $asig = testsDeConsulta($ficha['tests_asignados'] ?? ''); foreach (testsCatalogo() as $clave => $t): ?>
+      <label style="display:block;margin:4px 0"><input type="checkbox" name="tests[]" value="<?= h($clave) ?>" <?= in_array($clave, $asig, true) ? 'checked' : '' ?>> <?= h($t['nombre']) ?></label>
+    <?php endforeach; ?>
+    <button class="btn btn-outline-dark" style="margin-top:8px">Guardar tests habilitados</button>
+  </form>
+  <?php
+    $resultados = [];
+    if (!empty($ficha['usuario_id'])) {
+      try {
+        $rt = $pdo->prepare("SELECT id, test, resumen, datos, creado_en FROM resultados_tests WHERE usuario_id = ? ORDER BY id DESC LIMIT 30");
+        $rt->execute([$ficha['usuario_id']]);
+        $resultados = $rt->fetchAll(PDO::FETCH_ASSOC);
+      } catch (Throwable $e) { error_log('resultados_tests: ' . $e->getMessage()); }
+    }
+  ?>
+  <h3>Resultados guardados por la persona</h3>
+  <?php if (!$resultados): ?>
+    <p class="mut">Aún no ha guardado resultados de tests.</p>
+  <?php else: foreach ($resultados as $r): ?>
+    <div style="border-top:1px solid #eadfc9;padding:10px 0">
+      <p style="margin:0"><span class="chip"><?= h(testsCatalogo()[$r['test']]['nombre'] ?? $r['test']) ?></span> <span class="mut"><?= h($r['creado_en']) ?></span></p>
+      <p style="margin:6px 0"><?= h($r['resumen']) ?></p>
+      <?php $d = json_decode((string)$r['datos'], true); if (!empty($d['respuestas'])): ?>
+        <details><summary class="mut">Ver respuestas y notas (<?= count($d['respuestas']) ?>)</summary>
+          <table class="tabla">
+            <?php foreach ($d['respuestas'] as $x): ?>
+              <tr><td><?= h($x['tema'] ?? '') ?><br><?= h($x['pregunta'] ?? '') ?></td><td><strong><?= h($x['respuesta'] ?? '') ?></strong><?= !empty($x['nota']) ? '<br>' . nl2br(h($x['nota'])) : '' ?></td></tr>
+            <?php endforeach; ?>
+          </table>
+        </details>
+      <?php endif; ?>
+      <?php if (!empty($d['ancestros'])): ?>
+        <p class="mut" style="margin:6px 0">Árbol: <?php foreach ($d['ancestros'] as $a) echo h(($a['nombre'] ?? '?') . ' (' . ($a['vinculo'] ?? '') . ')') . '; '; ?></p>
+      <?php endif; ?>
+    </div>
+  <?php endforeach; endif; ?>
   <p><a href="/terapeuta.php">Cerrar ficha</a></p>
 </div>
 <?php endif; ?>
@@ -257,6 +308,12 @@ paginaInicio('Panel del terapeuta');
     <span class="etq">Talleres que le recomiendas según lo evidenciado</span>
     <?php foreach ($catalogo as $clave => $t): ?>
       <label style="display:block;margin:6px 0"><input type="checkbox" name="talleres[]" value="<?= h($clave) ?>">
+        <strong><?= h($t['nombre']) ?></strong> <span class="mut">— <?= h($t['resumen']) ?></span></label>
+    <?php endforeach; ?>
+
+    <span class="etq">Tests que le habilitas (los hará dentro de Mi camino)</span>
+    <?php foreach (testsCatalogo() as $clave => $t): ?>
+      <label style="display:block;margin:6px 0"><input type="checkbox" name="tests[]" value="<?= h($clave) ?>">
         <strong><?= h($t['nombre']) ?></strong> <span class="mut">— <?= h($t['resumen']) ?></span></label>
     <?php endforeach; ?>
 

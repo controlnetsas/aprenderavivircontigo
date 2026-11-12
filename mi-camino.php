@@ -13,7 +13,7 @@ $catalogo = talleresCatalogo();
 $estados = estadosTaller();
 
 paginaInicio('Mi camino');
-echo '<p class="mut"><a href="/membresia.php">← Mi membresía</a></p>';
+echo '<p class="mut"><a href="/membresia.php">← Mi membresía</a> · <a href="/mis-tests.php">Mis tests</a></p>';
 echo '<h1>Mi camino, ' . h(primerNombre($usuario['nombre'])) . '</h1>';
 if (!empty($_GET['bienvenida'])) echo aviso('ok', 'Tu cuenta está lista. Aquí verás tus ejercicios de cada día y tus talleres.');
 

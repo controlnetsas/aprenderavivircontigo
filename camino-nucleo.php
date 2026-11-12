@@ -148,3 +148,55 @@ function consultasDeUsuario($pdo, $usuario) {
   $s->execute([$usuario['id']]);
   return $s->fetchAll(PDO::FETCH_ASSOC);
 }
+
+// ---- Tests privados: solo miembros activos, terapeuta, o consultantes a quienes el terapeuta se los asignó ----
+function testsCatalogo() {
+  return [
+    'genealogia' => ['nombre' => 'Test de Genealogía', 'resumen' => 'Construye tu árbol y recorre los seis temas del taller Sanando con mi Linaje.', 'pagina' => '/test-genealogia.php'],
+    'reconocete' => ['nombre' => 'Test Reconóce TE', 'resumen' => 'Los 9 eneatipos y las 5 heridas de la infancia.', 'pagina' => '/test-reconocete.php'],
+    'vientre'    => ['nombre' => 'Test Regresando al Vientre', 'resumen' => '30 preguntas sobre tu vínculo con tu madre y con tu padre.', 'pagina' => '/test-vientre.php'],
+  ];
+}
+
+function testsDeConsulta($csv) {
+  $validos = array_keys(testsCatalogo());
+  $out = [];
+  foreach (explode(',', (string)$csv) as $t) { $t = trim($t); if (in_array($t, $validos, true)) $out[] = $t; }
+  return array_values(array_unique($out));
+}
+
+// Lista de tests que la persona puede hacer hoy.
+function testsPermitidos($pdo, $usuario) {
+  $todos = array_keys(testsCatalogo());
+  if (!$usuario) return [];
+  if (($usuario['rol'] ?? '') === 'terapeuta' || esMiembroActivo($usuario)) return $todos;
+  $ok = [];
+  foreach (consultasDeUsuario($pdo, $usuario) as $c) {
+    if (($c['estado'] ?? '') === 'finalizada') continue;
+    $ok = array_merge($ok, testsDeConsulta($c['tests_asignados'] ?? ''));
+  }
+  return array_values(array_unique($ok));
+}
+
+function accesoTest($pdo, $usuario, $clave) {
+  return in_array($clave, testsPermitidos($pdo, $usuario), true);
+}
+
+// Página privada de un test: exige sesión y acceso; si no, muestra cómo conseguirlo.
+function abrirTest($clave) {
+  requiereLogin();
+  $pdo = conexionDB();
+  $usuario = usuarioActual();
+  if (!$usuario) { header('Location: /login.html'); exit; }
+  $cat = testsCatalogo()[$clave];
+  if (!accesoTest($pdo, $usuario, $clave)) {
+    paginaInicio($cat['nombre']);
+    echo '<div class="card"><h1>' . h($cat['nombre']) . '</h1>'
+       . '<p>Este test se hace con acompañamiento. Está disponible para miembros del club o cuando Carlos te lo envía después de tu consulta.</p>'
+       . '<p class="fila"><a class="btn btn-primary" target="_blank" rel="noopener" href="https://wa.me/' . WHATSAPP_AVC . '?text=' . rawurlencode('Hola Carlos, quiero hacer el ' . $cat['nombre'] . '.') . '">Pedirlo por WhatsApp</a>'
+       . '<a class="btn btn-outline-dark" href="/membresia.php">Mi membresía</a></p></div>';
+    paginaFin();
+    exit;
+  }
+  return [$pdo, $usuario, $cat];
+}

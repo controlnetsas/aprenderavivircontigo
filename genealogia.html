@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sanando con mi Linaje | Aprender a Vivir Contigo</title>
-<meta name="description" content="Taller Sanando con mi Linaje: construye tu árbol genealógico, recorre seis temas sistémicos y haz el Test de Genealogía — todo lo que necesitas para empezar en un solo lugar.">
+<meta name="description" content="Taller Sanando con mi Linaje: construye tu árbol genealógico, recorre seis temas sistémicos — todo lo que necesitas para empezar en un solo lugar.">
 <link rel="icon" type="image/png" href="assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,6 @@
     <h1>Sanando con mi Linaje</h1>
     <p>Construye el mapa visual de tu sistema familiar y recorre seis temas sistémicos que te ayudan a leerlo: lealtades invisibles, cargas transgeneracionales y secretos que puedan estar condicionando tu vida hoy — para vivir con mayor libertad y conciencia.</p>
     <div style="margin-top:22px;">
-      <a href="#test" class="btn btn-primary" style="margin-right:12px;">Hacer el Test de Genealogía</a>
       <a href="https://wa.me/573176435131?text=Hola%2C%20quiero%20inscribirme%20al%20taller%20Sanando%20con%20mi%20Linaje" target="_blank" rel="noopener" class="btn btn-outline">Inscribirme por WhatsApp</a>
     </div>
   </div>
@@ -109,54 +108,16 @@
   </div>
 </section>
 
-<section id="test">
+<section id="tests-acompanados">
   <div class="container">
-    <div class="section-head left" style="max-width:760px;">
-      <span class="small-caps eyebrow-gap">Antes del taller</span>
-      <h2>Haz el Test de Genealogía</h2>
-      <p>Un cuestionario privado de autoindagación, con las preguntas de cada tema — no se puntúa ni da un "resultado": es un espacio para observarte con calma antes de llegar al taller. Tus respuestas se quedan solo en tu navegador y las puedes descargar al final.</p>
-    </div>
-
-    <div id="genealogia-test-gate" class="card" style="max-width:480px;margin:28px auto 0;">
-      <span class="small-caps eyebrow-gap">Antes de empezar</span>
-      <h3 class="mt-0">Regístrate para acceder al test</h3>
-      <p style="font-size:0.9rem;margin-bottom:16px;">Solo te pedimos tu nombre y correo para guardar tu cupo de interés en el taller — el test en sí no se envía a ningún lado, solo tus datos de contacto.</p>
-      <form id="form-genealogia-test" class="formulario" novalidate>
-        <div>
-          <label for="genealogia-nombre">Nombre*</label>
-          <input type="text" id="genealogia-nombre" name="nombre" required>
-        </div>
-        <div>
-          <label for="genealogia-correo">Correo electrónico*</label>
-          <input type="email" id="genealogia-correo" name="correo" required>
-        </div>
-        <div>
-          <label for="genealogia-whatsapp">WhatsApp (opcional)</label>
-          <input type="tel" id="genealogia-whatsapp" name="whatsapp">
-        </div>
-        <div id="genealogia-test-status" class="form-status" role="status"></div>
-        <button type="submit" class="btn btn-primary btn-block">Acceder al test</button>
-      </form>
-    </div>
-
-    <div id="contenido-genealogia-test" style="display:none;margin-top:28px;">
-      <div class="section-head left" style="max-width:760px;">
-        <span class="small-caps eyebrow-gap">Antes de los seis temas</span>
-        <h2>Construye tu árbol</h2>
-        <p>Agrega los ancestros que quieras recordar — padres, abuelos, hermanos u otros. Con cada uno, indica el vínculo familiar y por qué lo recuerdas.</p>
-      </div>
-      <div id="arbol-genealogico-wizard" style="margin-top:24px;"></div>
-
-      <div class="section-head left" style="max-width:760px;margin-top:56px;">
-        <span class="small-caps eyebrow-gap">Los seis temas</span>
-        <h2>Responde con lo primero que aparezca</h2>
-      </div>
-      <div id="lista-genealogia-test" style="margin-top:28px;"></div>
-      <div id="genea-resumen-temas" style="margin-top:40px;"></div>
-      <div class="genea-descargar-wrap">
-        <button type="button" id="btn-descargar-genealogia" class="btn btn-primary">Descargar mi árbol y respuestas</button>
-        <p>Se descarga un archivo .html con tu árbol genealógico, el contexto de trauma heredado y todas tus respuestas. Se abre en cualquier navegador y lo puedes guardar como PDF. Puedes volver cuantas veces quieras y descargar de nuevo.</p>
-      </div>
+    <div class="card" style="max-width:640px;margin:0 auto;text-align:center;">
+      <span class="small-caps eyebrow-gap">Con acompañamiento</span>
+      <h3 class="mt-0">Los tests se hacen dentro de tu proceso</h3>
+      <p>Para que el resultado tenga sentido, los tests de autoindagación (Genealogía, Reconóce TE y Regresando al Vientre) se realizan con acompañamiento: Carlos te los habilita después de tu consulta, y están incluidos para quienes son miembros del club.</p>
+      <p style="margin-top:18px;">
+        <a href="https://wa.me/573176435131?text=Hola%2C%20quiero%20agendar%20una%20consulta%20y%20hacer%20los%20tests" target="_blank" rel="noopener" class="btn btn-primary" style="margin-right:10px;">Agendar consulta por WhatsApp</a>
+        <a href="mis-tests.php" class="btn btn-outline-dark">Ya tengo cuenta: Mis tests</a>
+      </p>
     </div>
   </div>
 </section>
@@ -223,11 +184,5 @@
   <img src="assets/img/icon-whatsapp.png" alt="">
 </a>
 <script src="assets/js/main.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="assets/js/registro.js"></script>
-<script src="assets/js/genealogia-arbol.js"></script>
-<script src="assets/js/reco-quiz.js"></script>
-<script src="assets/js/genealogia-test.js"></script>
-<script src="assets/js/genealogia-test-render.js"></script>
 </body>
 </html>
