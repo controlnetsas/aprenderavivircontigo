@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ex->execute([$email]);
     $existente = $ex->fetch(PDO::FETCH_ASSOC);
     if ($existente && (int)$existente['email_verificado'] === 1) {
-      $error = 'Ese correo ya tiene cuenta. <a href="/login.html">Inicia sesión</a> y vuelve a abrir este enlace.';
+      $error = 'Ese correo ya tiene cuenta. <a href="/login.html?next=' . urlencode('/evaluacion.php?t=' . $token) . '"><strong>Inicia sesión aquí</strong></a> y continúas con tu evaluación.';
     } elseif ($existente) {
       $error = 'Ese correo ya se registró pero falta confirmarlo. <a href="/olvide-clave.php">Reenviar el correo de confirmación</a>.';
     } else {
@@ -134,7 +134,7 @@ paginaInicio('Evaluación inicial');
     </label>
     <button class="btn btn-primary btn-block" type="submit">Crear mi cuenta</button>
   </form>
-  <p class="mut" style="margin-top:14px">¿Ya tienes cuenta? <a href="/login.html">Inicia sesión</a> y vuelve a abrir este enlace.</p>
+  <p class="mut" style="margin-top:14px">¿Ya tienes cuenta? <a href="/login.html?next=<?= h(urlencode('/evaluacion.php?t=' . $token)) ?>">Inicia sesión</a> y continúas con tu evaluación.</p>
 </div>
 <p class="mut" style="margin-top:14px">Esta evaluación es educativa y complementaria; no reemplaza atención médica ni psicológica.</p>
 <script src="/assets/js/password.js"></script>

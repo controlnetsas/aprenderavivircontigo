@@ -23,6 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $estadoEv = $ev->fetchColumn();
       if ($estadoEv !== false && $estadoEv !== 'completada') $destino = '/mi-evaluacion.php';
     } catch (Throwable $e) { /* sin tabla de evaluaciones */ }
+    // Si venía de un enlace de evaluación, regresa ahí (solo se acepta ese formato exacto).
+    $next = $_POST['next'] ?? '';
+    if (is_string($next) && preg_match('#^/evaluacion\.php\?t=[a-f0-9]{64}$#', $next)) $destino = $next;
     header('Location: ' . $destino);
     exit;
   }

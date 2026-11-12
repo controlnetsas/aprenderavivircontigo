@@ -51,6 +51,7 @@
       <span class="small-caps eyebrow-gap">Ya tengo cuenta</span>
       <h3 class="mt-0">Iniciar sesión</h3>
       <form id="form-login" class="formulario" action="login.php" method="post" novalidate>
+        <input type="hidden" name="next" id="login-next" value="">
         <div>
           <label for="login-correo">Correo electrónico*</label>
           <input type="email" id="login-correo" name="correo" required>
@@ -118,6 +119,8 @@
 <script>
   (function () {
     var params = new URLSearchParams(window.location.search);
+    var nx = params.get('next');
+    if (nx && /^\/evaluacion\.php\?t=[a-f0-9]{64}$/.test(nx)) document.getElementById('login-next').value = nx;
     var error = params.get('error');
     if (!error) return;
 
