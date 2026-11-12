@@ -31,8 +31,8 @@ paginaInicio('Bienvenida a tu proceso');
 .bv-seguro strong{color:#fff}
 .bv-ayuda{background:#fff6d9;border-left:6px solid #F5C343}
 .bv-reg{background:linear-gradient(135deg,#F5C343,#f3a65c);color:#211A33;text-align:center;padding:30px 22px}
-.bv-reg h2{font-size:1.5rem}
-.bv-reg .btn-primary{background:#211A33;color:#fff;font-size:17px;padding:14px 28px}
+.bv-reg h2{font-size:1.8rem}.bv-reg{padding:38px 22px;box-shadow:0 10px 30px rgba(245,195,67,.45)}
+.bv-reg .btn-primary{background:#211A33;color:#fff;font-size:19px;padding:17px 34px}.bv-form .btn-primary{font-size:19px;padding:16px}
 .bv-reg .btn-outline-dark{background:rgba(255,255,255,.6)}
 .bv-reg .mut{color:#211A33;opacity:.8;font-size:14px}
 .bv-firma{text-align:center;color:#6b6480;font-size:14px;margin-top:6px}
@@ -92,7 +92,7 @@ paginaInicio('Bienvenida a tu proceso');
 <div class="bv bv-reg" id="registro">
   <h2>¿Listo/a para empezar?</h2>
   <?php if ($destino): ?>
-    <p>Crea tu cuenta con tu nombre, correo y celular. Te toma un par de minutos.</p>
+    <p style="font-size:18px"><strong>Crea tu cuenta para comenzar.</strong> Te toma un par de minutos.</p>
     <p class="fila solo-movil" style="justify-content:center;margin-top:14px">
       <a class="btn btn-primary" href="<?= h($destino) ?>">Registrarme y comenzar</a>
     </p>
@@ -123,9 +123,7 @@ paginaInicio('Bienvenida a tu proceso');
     <p>Para registrarte, usa el enlace personal que te envió tu terapeuta.</p>
     <p class="mut">¿Ya tienes cuenta? <a href="/login.html" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
   <?php endif; ?>
-  <p class="fila" style="justify-content:center;margin-top:10px">
-    <a class="btn btn-outline-dark" target="_blank" rel="noopener" href="<?= h($wa) ?>">¿Dudas? Escríbeme por WhatsApp</a>
-  </p>
+  <p class="mut" style="margin-top:6px;font-size:13px">¿Dudas? <a target="_blank" rel="noopener" href="<?= h($wa) ?>" style="color:#211A33;text-decoration:underline">Escríbeme por WhatsApp</a></p>
 </div>
 <p class="bv-firma">Con cariño, Carlos Andrés Echeverry · Aprender a Vivir Contigo</p>
 
