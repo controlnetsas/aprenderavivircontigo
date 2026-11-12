@@ -12,7 +12,8 @@ function paginaTestInicio($clave, $cat, $intro) {
 function paginaTestFin($clave, $scripts) {
   $csrf = tokenCsrf();
   echo '<div id="guardar-panel" style="margin-top:36px"></div>';
-  echo '<script>window.AVC_TEST_CLAVE=' . json_encode($clave) . ';window.AVC_CSRF=' . json_encode($csrf) . ';</script>';
+  echo '<script>window.AVC_TEST_CLAVE=' . json_encode($clave) . ';window.AVC_CSRF=' . json_encode($csrf) . ';'
+     . (!empty($_GET['eval']) ? 'window.AVC_VOLVER="/mi-evaluacion.php";' : '') . '</script>';
   foreach ($scripts as $s) echo '<script src="/assets/js/' . h($s) . '.js"></script>';
   echo '<script src="/assets/js/guardar-test.js"></script>';
   paginaFin();

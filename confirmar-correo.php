@@ -14,7 +14,13 @@ if ($token) {
     $pdo->prepare("UPDATE usuarios SET email_verificado = 1, token_verificacion = NULL WHERE id = ?")
         ->execute([$usuario['id']]);
     $_SESSION['usuario_id'] = $usuario['id'];
-    header('Location: /membresia.php?correo-confirmado=1');
+    $destino = '/membresia.php?correo-confirmado=1';
+    try {
+      $ev = $pdo->prepare("SELECT id FROM evaluaciones WHERE usuario_id = ?");
+      $ev->execute([$usuario['id']]);
+      if ($ev->fetchColumn()) $destino = '/mi-evaluacion.php?confirmado=1';
+    } catch (Throwable $e) { /* sin tabla de evaluaciones: flujo normal */ }
+    header('Location: ' . $destino);
     exit;
   }
 }

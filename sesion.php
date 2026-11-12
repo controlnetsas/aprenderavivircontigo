@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 function usuarioActual() {
   if (empty($_SESSION['usuario_id'])) return null;
   $stmt = conexionDB()->prepare(
-    "SELECT id, nombre, email, estado_membresia, fecha_vencimiento, rol FROM usuarios WHERE id = ?"
+    "SELECT id, nombre, email, telefono, estado_membresia, fecha_vencimiento, rol FROM usuarios WHERE id = ?"
   );
   $stmt->execute([$_SESSION['usuario_id']]);
   return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;

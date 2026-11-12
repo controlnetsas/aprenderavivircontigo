@@ -25,7 +25,10 @@
         body: JSON.stringify({ test: clave, resumen: payload.resumen, datos: payload.datos })
       }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
         .then(function (x) {
-          if (x.ok && x.d.ok) { est.textContent = '✓ Guardado. Gracias por compartirlo.'; }
+          if (x.ok && x.d.ok) {
+            est.textContent = '✓ Guardado.';
+            if (window.AVC_VOLVER) { est.innerHTML = '✓ Guardado. <a class="btn btn-primary" href="' + window.AVC_VOLVER + '">Volver a mi evaluación</a>'; }
+          }
           else { est.textContent = (x.d && x.d.error) || 'No se pudo guardar. Intenta de nuevo.'; btn.disabled = false; }
         })
         .catch(function () { est.textContent = 'Sin conexión. Intenta de nuevo.'; btn.disabled = false; });

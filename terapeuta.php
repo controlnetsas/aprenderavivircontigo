@@ -164,7 +164,7 @@ if (isset($_GET['ver'])) {
 paginaInicio('Panel del terapeuta');
 ?>
 <h1>Panel del terapeuta</h1>
-<p class="mut">Sesión de <?= h($terapeuta['nombre']) ?> · <a href="/membresia.php">Volver a la membresía</a> · <a href="/cambiar-clave.php">Cambiar contraseña</a></p>
+<p class="mut">Sesión de <?= h($terapeuta['nombre']) ?> · <a href="/membresia.php">Volver a la membresía</a> · <a href="/cambiar-clave.php">Cambiar contraseña</a> · <a href="/evaluaciones.php"><strong>Evaluaciones iniciales</strong></a></p>
 <?= $mensaje ?>
 <?= $tarjetaEnlace ?>
 <?php if ($ficha):

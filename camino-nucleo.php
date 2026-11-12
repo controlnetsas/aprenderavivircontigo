@@ -171,6 +171,7 @@ function testsPermitidos($pdo, $usuario) {
   if (!$usuario) return [];
   if (($usuario['rol'] ?? '') === 'terapeuta' || esMiembroActivo($usuario)) return $todos;
   $ok = [];
+  if (evaluacionDeUsuario($pdo, $usuario['id'])) $ok = ['genealogia', 'reconocete'];
   foreach (consultasDeUsuario($pdo, $usuario) as $c) {
     if (($c['estado'] ?? '') === 'finalizada') continue;
     $ok = array_merge($ok, testsDeConsulta($c['tests_asignados'] ?? ''));
@@ -199,4 +200,32 @@ function abrirTest($clave) {
     exit;
   }
   return [$pdo, $usuario, $cat];
+}
+
+const TEXTO_CONSENTIMIENTO_EVAL = 'Acepto que Aprender a Vivir Contigo guarde mis datos, mis respuestas y los resultados de mis tests, y que el terapeuta los vea y reciba un informe con ellos para acompañarme. Puedo pedir que borren mis datos escribiendo al +57 317 643 5131.';
+
+// Evaluación inicial (por enlace del terapeuta) de la persona, si la tiene.
+function evaluacionDeUsuario($pdo, $usuarioId) {
+  try {
+    $s = $pdo->prepare("SELECT * FROM evaluaciones WHERE usuario_id = ?");
+    $s->execute([$usuarioId]);
+    return $s->fetch(PDO::FETCH_ASSOC) ?: null;
+  } catch (Throwable $e) { return null; }
+}
+
+// ¿Ya guardó cada parte de los tests de la evaluación? (genealogía, eneatipo, heridas)
+function avanceTestsEvaluacion($pdo, $usuarioId) {
+  $out = ['genealogia' => false, 'eneatipo' => false, 'herida' => false];
+  try {
+    $s = $pdo->prepare("SELECT test, datos FROM resultados_tests WHERE usuario_id = ?");
+    $s->execute([$usuarioId]);
+    foreach ($s->fetchAll(PDO::FETCH_ASSOC) as $r) {
+      if ($r['test'] === 'genealogia') $out['genealogia'] = true;
+      if ($r['test'] === 'reconocete') {
+        if (strpos((string)$r['datos'], '"parte":"eneatipo"') !== false) $out['eneatipo'] = true;
+        if (strpos((string)$r['datos'], '"parte":"herida"') !== false) $out['herida'] = true;
+      }
+    }
+  } catch (Throwable $e) {}
+  return $out;
 }

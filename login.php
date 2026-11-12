@@ -16,7 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (session_status() === PHP_SESSION_NONE) session_start();
     $_SESSION['usuario_id'] = $usuario['id'];
-    header('Location: /membresia.php');
+    $destino = '/membresia.php';
+    try {
+      $ev = conexionDB()->prepare("SELECT estado FROM evaluaciones WHERE usuario_id = ?");
+      $ev->execute([$usuario['id']]);
+      $estadoEv = $ev->fetchColumn();
+      if ($estadoEv !== false && $estadoEv !== 'completada') $destino = '/mi-evaluacion.php';
+    } catch (Throwable $e) { /* sin tabla de evaluaciones */ }
+    header('Location: ' . $destino);
     exit;
   }
 }
