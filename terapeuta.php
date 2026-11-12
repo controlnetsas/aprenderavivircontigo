@@ -20,6 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $whatsapp = trim($_POST['whatsapp'] ?? '');
     $fecha = $_POST['fecha_consulta'] ?? '';
     $plantillaId = (int)($_POST['plantilla_id'] ?? 0);
+    $edad = (int)($_POST['edad'] ?? 0);
+    $edad = ($edad >= 0 && $edad <= 120 && ($_POST['edad'] ?? '') !== '') ? $edad : null;
+    $sexo = in_array($_POST['sexo'] ?? '', ['femenino', 'masculino', 'otro'], true) ? $_POST['sexo'] : null;
+    $campoTxt = function ($k, $max) { $v = trim((string)($_POST[$k] ?? '')); return $v === '' ? null : mb_substr($v, 0, $max); };
+    $sintomas = $campoTxt('sintomas', 4000);
+    $situacion = $campoTxt('situacion_sentimental', 190);
+    $hijos = $campoTxt('hijos', 2000);
+    $hijosNoNac = $campoTxt('hijos_no_nacidos', 2000);
+    $estadoSalud = $campoTxt('estado_salud', 4000);
+    $trabajo = $campoTxt('trabajo_actual', 190);
+    $profesion = $campoTxt('profesion', 190);
     $notas = trim($_POST['notas_privadas'] ?? '');
     $msgTer = trim($_POST['mensaje_terapeuta'] ?? '');
     $talleres = array_values(array_intersect(array_keys($catalogo), (array)($_POST['talleres'] ?? [])));
@@ -34,11 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $expira = date('Y-m-d H:i:s', strtotime('+14 days'));
       $ins = $pdo->prepare(
         "INSERT INTO consultas (terapeuta_usuario_id, nombre, email, whatsapp, fecha_consulta, notas_privadas,
-           mensaje_terapeuta, plantilla_id, talleres_recomendados, token, token_expira)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+           mensaje_terapeuta, plantilla_id, talleres_recomendados, token, token_expira,
+           edad, sexo, sintomas, situacion_sentimental, hijos, hijos_no_nacidos, estado_salud, trabajo_actual, profesion)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?)"
       );
       $ins->execute([$terapeuta['id'], $nombre, $email, $whatsapp ?: null, $fecha, $notas ?: null,
-        $msgTer ?: null, $plantillaId, implode(',', $talleres) ?: null, $token, $expira]);
+        $msgTer ?: null, $plantillaId, implode(',', $talleres) ?: null, $token, $expira,
+        $edad, $sexo, $sintomas, $situacion, $hijos, $hijosNoNac, $estadoSalud, $trabajo, $profesion]);
       $nueva = ['id' => (int)$pdo->lastInsertId(), 'nombre' => $nombre, 'email' => $email,
                 'whatsapp' => $whatsapp, 'token' => $token];
     }
@@ -103,12 +116,39 @@ $lista = $pdo->prepare(
 $lista->execute([$terapeuta['id']]);
 $consultas = $lista->fetchAll(PDO::FETCH_ASSOC);
 
+$ficha = null;
+if (isset($_GET['ver'])) {
+  $f = $pdo->prepare("SELECT c.*, p.nombre AS plantilla FROM consultas c JOIN plantillas_seguimiento p ON p.id = c.plantilla_id
+                      WHERE c.id = ? AND c.terapeuta_usuario_id = ?");
+  $f->execute([(int)$_GET['ver'], $terapeuta['id']]);
+  $ficha = $f->fetch(PDO::FETCH_ASSOC) ?: null;
+}
+
 paginaInicio('Panel del terapeuta');
 ?>
 <h1>Panel del terapeuta</h1>
 <p class="mut">Sesión de <?= h($terapeuta['nombre']) ?> · <a href="/membresia.php">Volver a la membresía</a> · <a href="/cambiar-clave.php">Cambiar contraseña</a></p>
 <?= $mensaje ?>
 <?= $tarjetaEnlace ?>
+<?php if ($ficha):
+  $filas = [
+    'Edad' => $ficha['edad'], 'Sexo' => $ficha['sexo'], 'Síntomas' => $ficha['sintomas'],
+    'Situación sentimental' => $ficha['situacion_sentimental'], 'Hijos y nombres' => $ficha['hijos'],
+    'Hijos no nacidos o muertos al nacer' => $ficha['hijos_no_nacidos'], 'Estado de salud' => $ficha['estado_salud'],
+    'Trabajo actual' => $ficha['trabajo_actual'], 'Profesión' => $ficha['profesion'], 'Notas privadas' => $ficha['notas_privadas'],
+  ]; ?>
+<div class="card" style="margin:18px 0">
+  <h2>Ficha de <?= h($ficha['nombre']) ?></h2>
+  <p class="mut"><?= h($ficha['email']) ?> · Consulta del <?= h(fechaCorta($ficha['fecha_consulta'])) ?> · Plantilla: <?= h($ficha['plantilla']) ?></p>
+  <table class="tabla">
+    <?php foreach ($filas as $k => $v): ?>
+      <tr><th style="width:38%"><?= h($k) ?></th><td><?= ($v === null || $v === '') ? '<span class="mut">—</span>' : nl2br(h($v)) ?></td></tr>
+    <?php endforeach; ?>
+  </table>
+  <p><a href="/terapeuta.php">Cerrar ficha</a></p>
+</div>
+<?php endif; ?>
+
 
 <div class="card">
   <h2>Nueva consulta</h2>
@@ -123,6 +163,32 @@ paginaInicio('Panel del terapeuta');
     <input class="campo" id="whatsapp" name="whatsapp" inputmode="tel" maxlength="30">
     <label class="etq" for="fecha">Fecha de la consulta</label>
     <input class="campo" id="fecha" name="fecha_consulta" type="date" value="<?= h(hoy()) ?>" required>
+
+    <h3 style="margin-top:26px">Ficha de la consulta</h3>
+    <p class="mut">Solo tú ves estos datos. No se envían por correo ni por WhatsApp, ni los ve la persona.</p>
+    <div class="fila">
+      <div style="flex:1;min-width:120px"><label class="etq" for="edad">Edad</label>
+        <input class="campo" id="edad" name="edad" type="number" min="0" max="120" inputmode="numeric"></div>
+      <div style="flex:2;min-width:160px"><label class="etq" for="sexo">Sexo</label>
+        <select class="campo" id="sexo" name="sexo"><option value="">—</option>
+          <option value="femenino">Femenino</option><option value="masculino">Masculino</option><option value="otro">Otro</option></select></div>
+    </div>
+    <label class="etq" for="sintomas">Síntomas</label>
+    <textarea class="campo" id="sintomas" name="sintomas" rows="3" maxlength="4000"></textarea>
+    <label class="etq" for="situacion_sentimental">Situación sentimental actual</label>
+    <input class="campo" id="situacion_sentimental" name="situacion_sentimental" maxlength="190" placeholder="Ej.: casada, separada hace 2 años, soltero…">
+    <label class="etq" for="hijos">Hijos y sus nombres</label>
+    <textarea class="campo" id="hijos" name="hijos" rows="2" maxlength="2000" placeholder="Ej.: Ana (12), Luis (8)"></textarea>
+    <label class="etq" for="hijos_no_nacidos">Hijos no nacidos o muertos al nacer</label>
+    <textarea class="campo" id="hijos_no_nacidos" name="hijos_no_nacidos" rows="2" maxlength="2000" placeholder="Abortos, pérdidas gestacionales, hijos fallecidos al nacer…"></textarea>
+    <label class="etq" for="estado_salud">Estado de salud</label>
+    <textarea class="campo" id="estado_salud" name="estado_salud" rows="3" maxlength="4000"></textarea>
+    <div class="fila">
+      <div style="flex:1;min-width:200px"><label class="etq" for="trabajo_actual">Trabajo actual</label>
+        <input class="campo" id="trabajo_actual" name="trabajo_actual" maxlength="190"></div>
+      <div style="flex:1;min-width:200px"><label class="etq" for="profesion">Profesión</label>
+        <input class="campo" id="profesion" name="profesion" maxlength="190"></div>
+    </div>
 
     <label class="etq" for="plantilla">Plantilla de ejercicios diarios</label>
     <select class="campo" id="plantilla" name="plantilla_id" required>
@@ -167,6 +233,7 @@ paginaInicio('Panel del terapeuta');
                           : '<span class="chip">' . h($c['estado'] === 'finalizada' ? 'Finalizada' : 'En proceso') . '</span>' ?></td>
       <td><?= $pendiente ? '—' : (int)$c['hechos'] . ' / ' . (int)$c['total'] ?></td>
       <td>
+        <a href="?ver=<?= (int)$c['id'] ?>">Ver ficha</a><br>
         <?php if ($pendiente): ?>
           <form method="post"><input type="hidden" name="csrf" value="<?= h(tokenCsrf()) ?>">
             <input type="hidden" name="accion" value="reenviar"><input type="hidden" name="consulta_id" value="<?= (int)$c['id'] ?>">
