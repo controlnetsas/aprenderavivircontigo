@@ -35,6 +35,8 @@ paginaInicio('Bienvenida a tu proceso');
 .bv-reg .btn-primary{background:#211A33;color:#fff;font-size:19px;padding:17px 34px}.bv-form .btn-primary{font-size:19px;padding:16px}
 .bv-reg .btn-outline-dark{background:rgba(255,255,255,.6)}
 .bv-reg .mut{color:#211A33;opacity:.8;font-size:14px}
+.bv-login{background:#fff;max-width:460px;margin:0 auto 16px;box-shadow:0 6px 24px rgba(33,26,51,.08)}.bv-login .etq{display:block;font-size:13px;font-weight:600;margin:12px 0 3px}.bv-login .btn-primary{background:#F5C343;color:#211A33;font-size:17px;padding:14px}
+.bv-wa{background:#e9f8ef;text-align:center;max-width:460px;margin:0 auto 16px;padding:18px 22px}.bv-wa .btn{background:#fff;border:2px solid #25D366;color:#211A33}
 .bv-firma{text-align:center;color:#6b6480;font-size:14px;margin-top:6px}
 .bv-barra{position:fixed;left:0;right:0;bottom:0;background:#211A33;padding:10px 16px;text-align:center;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
 .bv-barra a{display:inline-block;background:#F5C343;color:#211A33;font-family:Poppins,Arial,sans-serif;font-weight:600;border-radius:30px;padding:11px 26px;text-decoration:none}
@@ -118,12 +120,28 @@ paginaInicio('Bienvenida a tu proceso');
       <button class="btn btn-primary btn-block" type="submit" style="width:100%">Crear mi cuenta y comenzar</button>
       <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
     </form>
-    <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="/login.html" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
+    <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
   <?php else: ?>
     <p>Para registrarte, usa el enlace personal que te envió tu terapeuta.</p>
-    <p class="mut">¿Ya tienes cuenta? <a href="/login.html" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
+    <p class="mut">¿Ya tienes cuenta? <a href="#login" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
   <?php endif; ?>
   <p class="mut" style="margin-top:6px;font-size:13px">¿Dudas? <a target="_blank" rel="noopener" href="<?= h($wa) ?>" style="color:#211A33;text-decoration:underline">Escríbeme por WhatsApp</a></p>
+</div>
+<div class="bv bv-login" id="login">
+  <p class="bv-eti" style="color:#C2607D">Ya tengo cuenta</p>
+  <h2>Iniciar sesión</h2>
+  <form method="post" action="/login.php">
+    <label class="etq" for="l-correo">Correo electrónico*</label>
+    <input class="campo" id="l-correo" name="correo" type="email" required autocomplete="username">
+    <label class="etq" for="l-pass">Contraseña*</label>
+    <input class="campo" id="l-pass" name="password" type="password" required minlength="8" autocomplete="current-password">
+    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px;justify-content:center;text-align:center">Ingresar</button>
+  </form>
+  <p style="text-align:center;font-size:14px;margin:14px 0 0"><a href="/olvide-clave.php" style="color:#C2607D;text-decoration:underline">¿Olvidaste tu contraseña?</a></p>
+</div>
+<div class="bv bv-wa">
+  <p style="margin:0 0 10px">¿Tienes dudas antes de empezar?</p>
+  <a class="btn btn-outline-dark" target="_blank" rel="noopener" href="<?= h($wa) ?>">Escríbeme por WhatsApp</a>
 </div>
 <p class="bv-firma">Con cariño, Carlos Andrés Echeverry · Aprender a Vivir Contigo</p>
 
