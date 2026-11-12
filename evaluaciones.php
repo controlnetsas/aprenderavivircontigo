@@ -16,17 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tk = $pdo->prepare("SELECT token FROM enlaces_evaluacion WHERE terapeuta_usuario_id = ? AND activo = 1 ORDER BY id DESC LIMIT 1");
     $tk->execute([$terapeuta['id']]); $tok = $tk->fetchColumn();
     if ($nom !== '' && filter_var($mail, FILTER_VALIDATE_EMAIL) && $tok) {
-      $lnk = SITIO_URL . '/evaluacion.php?t=' . $tok;
+      $lnk = SITIO_URL . '/bienvenida.php?t=' . $tok;
       $primer = explode(' ', $nom)[0];
       $okc = enviarCorreo($mail, $nom, 'Tu evaluación inicial — Aprender a Vivir Contigo',
         '<h2 style="margin-top:0;">Hola, ' . textoSeguro($primer) . '</h2>'
-        . '<p>Gracias por pedir tu terapia. Para prepararla, necesito que completes tu evaluación inicial. Es sencillo:</p>'
+        . '<p>Gracias por pedir tu terapia: dar este paso es un acto de valentía. Entra con el botón: ahí te doy la bienvenida y te cuento cómo será el proceso. Para prepararlo, necesito que completes tu evaluación inicial. Es sencillo:</p>'
         . '<ol><li>Entra con el botón y <strong>crea tu cuenta</strong> (nombre completo, correo, celular y contraseña).</li>'
         . '<li><strong>Confirma tu correo</strong> con el mensaje que te llegará.</li>'
         . '<li><strong>Llena tu ficha</strong> con tus datos básicos.</li>'
         . '<li><strong>Haz los tres tests</strong>: genealogía, eneatipos y heridas de la infancia.</li></ol>'
         . '<p>Puedes hacerlo a tu ritmo. Lo que respondas queda guardado y solo lo veo yo.</p>'
-        . botonCorreo($lnk, 'Empezar mi evaluación'));
+        . botonCorreo($lnk, 'Leer mi bienvenida y empezar'));
       $_SESSION['flash_inv'] = $okc ? 'Invitación enviada a ' . $mail . '.' : 'No se pudo enviar el correo. Envía el enlace por WhatsApp.';
       if ($cel !== '') $_SESSION['flash_wa'] = linkWhatsApp($cel, "Hola {$primer}, soy Carlos de Aprender a Vivir Contigo. Te envié a tu correo ({$mail}) las indicaciones para tu evaluación inicial. Si no te llega, revisa spam o entra aquí:\n" . $lnk);
     } else { $_SESSION['flash_inv'] = 'Escribe nombre y un correo válido.'; }
@@ -43,7 +43,7 @@ if (!$token) {
   $token = bin2hex(random_bytes(32));
   $pdo->prepare("INSERT INTO enlaces_evaluacion (terapeuta_usuario_id, token) VALUES (?, ?)")->execute([$terapeuta['id'], $token]);
 }
-$link = SITIO_URL . '/evaluacion.php?t=' . $token;
+$link = SITIO_URL . '/bienvenida.php?t=' . $token; // página de bienvenida; su botón lleva al registro
 $textoWa = "Hola, soy Carlos de Aprender a Vivir Contigo. Para tu proceso, entra a este enlace, crea tu cuenta y llena tu evaluación inicial (una ficha y tres tests):\n" . $link;
 
 $l = $pdo->prepare("SELECT e.id, e.estado, e.ficha_completa, e.creado_en, e.completada_en, u.nombre, u.email, u.telefono, u.email_verificado, u.id AS uid
@@ -57,7 +57,7 @@ paginaInicio('Evaluaciones iniciales');
 <h1>Evaluaciones iniciales</h1>
 <div class="card" style="margin-bottom:16px">
   <h2 style="margin-top:0">Tu enlace para enviar</h2>
-  <p>Mándaselo a quien quieras evaluar. Quien lo abre debe crear su cuenta (nombre completo, correo, celular y contraseña), confirmar su correo, y luego llena su ficha y hace los tests.</p>
+  <p>Mándaselo a quien quieras evaluar: primero verá la página de bienvenida y desde ahí empieza su registro. Quien lo abre debe crear su cuenta (nombre completo, correo, celular y contraseña), confirmar su correo, y luego llena su ficha y hace los tests.</p>
   <input class="campo" id="enlace" readonly value="<?= h($link) ?>" onclick="this.select()">
   <p class="fila" style="margin-top:10px">
     <button class="btn btn-outline-dark" type="button" onclick="navigator.clipboard.writeText(document.getElementById('enlace').value);this.textContent='¡Copiado!'">Copiar enlace</button>
