@@ -42,7 +42,17 @@ if ($codigoReal !== '' && $abierta && $_SERVER['REQUEST_METHOD'] === 'POST' && (
 
     if ($u) {
       // Cuenta existente: se comprueba su contraseña y se le da el rol de terapeuta.
-      if (!password_verify($pass, $u['password_hash'] ?? '')) {
+      if (($u['password_hash'] ?? '') === '') {
+        // Cuenta creada por SQL sin contraseña: quien tiene el código la reclama y define su contraseña aquí.
+        if (strlen($pass) < 8) $error = 'La contraseña debe tener al menos 8 caracteres.';
+        elseif ($pass !== $pass2) $error = 'Esa cuenta aún no tiene contraseña: escríbela y confírmala en el campo de abajo.';
+        else {
+          $pdo->prepare("UPDATE usuarios SET password_hash = ?, rol = 'terapeuta', email_verificado = 1 WHERE id = ?")
+              ->execute([password_hash($pass, PASSWORD_DEFAULT), $u['id']]);
+          header('Location: /login.html?next=' . urlencode('/portal-terapeuta.php') . '&terapeuta=1');
+          exit;
+        }
+      } elseif (!password_verify($pass, $u['password_hash'] ?? '')) {
         $_SESSION['t_intentos']++;
         $error = 'Ya existe una cuenta con ese correo, pero la contraseña no coincide. Escribe la contraseña de esa cuenta.';
       } elseif (!(int)$u['email_verificado']) {

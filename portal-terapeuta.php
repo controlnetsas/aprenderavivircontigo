@@ -116,7 +116,7 @@ paginaInicio('Portal del terapeuta');
 <div class="tp-hero">
   <h1>Portal del terapeuta</h1>
   <p>Hola, <?= h(primerNombre($terapeuta['nombre'])) ?>. Aquí envías evaluaciones y revisas lo que llega.
-     <a href="/terapeuta.php">Planes y consultas</a> · <a href="/cambiar-clave.php">Cambiar contraseña</a> · <a href="/membresia.php">Mi cuenta</a></p>
+     <a href="/cambiar-clave.php">Cambiar contraseña</a> · <a href="/membresia.php">Mi cuenta</a></p>
 </div>
 
 <div class="stats">
