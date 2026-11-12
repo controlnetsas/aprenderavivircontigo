@@ -38,6 +38,11 @@ paginaInicio('Bienvenida a tu proceso');
 .bv-firma{text-align:center;color:#6b6480;font-size:14px;margin-top:6px}
 .bv-barra{position:fixed;left:0;right:0;bottom:0;background:#211A33;padding:10px 16px;text-align:center;z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
 .bv-barra a{display:inline-block;background:#F5C343;color:#211A33;font-family:Poppins,Arial,sans-serif;font-weight:600;border-radius:30px;padding:11px 26px;text-decoration:none}
+.bv-form{display:none;background:#fff;border-radius:16px;padding:20px 22px;text-align:left;margin:16px auto 0;max-width:560px;box-shadow:0 6px 20px rgba(33,26,51,.15)}
+.bv-form .etq{display:block;font-size:13px;font-weight:600;margin:10px 0 3px;color:#211A33}
+.bv-form .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.bv-form .mut{color:#6b6480;opacity:1;font-size:13px}
+@media(min-width:900px){.bv-form{display:block}.solo-movil{display:none!important}.bv-barra{display:none}}
 @media(max-width:600px){.bv-hero h1{font-size:1.6rem}.pasos4{grid-template-columns:1fr}}
 </style>
 
@@ -84,18 +89,35 @@ paginaInicio('Bienvenida a tu proceso');
   </ul>
 </div>
 
-<div class="bv bv-ayuda">
-  <h2>Si te sientes mal</h2>
-  <p>Remover la historia puede traer tristeza, rabia o cansancio; es normal. Si sientes que no puedes con lo que aparece o piensas en hacerte daño, <strong>no esperes a la sesión</strong>: llama a la <strong>línea 123</strong>, ve a urgencias o busca a alguien de confianza. Luego escríbeme.</p>
-</div>
-
 <div class="bv bv-reg" id="registro">
   <h2>¿Listo/a para empezar?</h2>
   <?php if ($destino): ?>
     <p>Crea tu cuenta con tu nombre, correo y celular. Te toma un par de minutos.</p>
-    <p class="fila" style="justify-content:center;margin-top:14px">
+    <p class="fila solo-movil" style="justify-content:center;margin-top:14px">
       <a class="btn btn-primary" href="<?= h($destino) ?>">Registrarme y comenzar</a>
     </p>
+    <form class="bv-form" method="post" action="/evaluacion.php" autocomplete="off">
+      <input type="hidden" name="t" value="<?= h($token) ?>">
+      <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="sitio_web" tabindex="-1" autocomplete="off"></div>
+      <label class="etq" for="b-nombre">Nombre completo</label>
+      <input class="campo" id="b-nombre" name="nombre" required maxlength="150">
+      <div class="g2">
+        <div><label class="etq" for="b-correo">Correo electrónico</label>
+        <input class="campo" id="b-correo" name="correo" type="email" required maxlength="190"></div>
+        <div><label class="etq" for="b-cel">Número de celular</label>
+        <input class="campo" id="b-cel" name="celular" type="tel" required maxlength="30" placeholder="3001234567"></div>
+        <div><label class="etq" for="b-p1">Contraseña (mín. 8)</label>
+        <input class="campo" id="b-p1" name="password" type="password" minlength="8" required autocomplete="new-password"></div>
+        <div><label class="etq" for="b-p2">Confirma tu contraseña</label>
+        <input class="campo" id="b-p2" name="password2" type="password" minlength="8" required autocomplete="new-password"></div>
+      </div>
+      <label style="display:flex;gap:10px;margin:14px 0;align-items:flex-start">
+        <input type="checkbox" name="consentimiento" value="1" required style="margin-top:4px">
+        <span class="mut"><?= h(TEXTO_CONSENTIMIENTO_EVAL) ?></span>
+      </label>
+      <button class="btn btn-primary btn-block" type="submit" style="width:100%">Crear mi cuenta y comenzar</button>
+      <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
+    </form>
     <p class="mut" style="margin-top:12px">¿Ya tienes cuenta? <a href="/login.html" style="color:#211A33;font-weight:600">Inicia sesión</a></p>
   <?php else: ?>
     <p>Para registrarte, usa el enlace personal que te envió tu terapeuta.</p>
