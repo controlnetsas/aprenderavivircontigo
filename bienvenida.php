@@ -119,7 +119,7 @@ paginaInicio('Bienvenida a tu proceso');
     </label>
     <?php else: ?><div style="height:14px"></div><?php endif; ?>
     <button class="btn btn-primary btn-block" type="submit" style="width:100%;flex-direction:column;line-height:1.3;white-space:normal;border-radius:28px;padding:14px 16px">Crear mi cuenta<small style="display:block;font-weight:600;font-size:17px;margin-top:6px;text-align:center">¡Después de este click vendrán muchos cambios!</small></button>
-    <p class="mut" style="margin:10px 0 0;text-align:center">Te enviaremos un correo para confirmar que es tuyo.</p>
+    <p class="mut" style="margin:14px 0 0;text-align:center;font-size:17px!important;line-height:1.45;color:#211A33">Te enviaremos un correo para confirmar que es tuyo.</p>
   </form>
 </div>
 <div class="bv bv-wa">
