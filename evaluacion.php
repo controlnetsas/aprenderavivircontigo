@@ -121,7 +121,7 @@ paginaInicio('Evaluación inicial');
     <input class="campo" id="nombre" name="nombre" required maxlength="150" value="<?= h($_POST['nombre'] ?? '') ?>">
     <label class="etq" for="correo">Correo electrónico</label>
     <input class="campo" id="correo" name="correo" type="email" required maxlength="190" value="<?= h($_POST['correo'] ?? '') ?>">
-    <p class="mut" style="margin:4px 0 0">Te enviaremos un correo para confirmar que es tuyo.</p>
+    <p class="mut" style="margin:4px 0 0">Te enviaremos un correo para confirmar tu registro.</p>
     <label class="etq" for="celular">Número de celular</label>
     <input class="campo" id="celular" name="celular" type="tel" required maxlength="30" value="<?= h($_POST['celular'] ?? '') ?>" placeholder="Ej.: 3001234567">
     <label class="etq" for="password">Contraseña (mínimo 8 caracteres)</label>
