@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once file_exists(__DIR__ . '/../config.php') ? __DIR__ . '/../config.php' : __DIR__ . '/config.php';
 
 function conexionDB() {
   static $pdo = null;

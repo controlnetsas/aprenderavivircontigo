@@ -6,14 +6,15 @@ ini_set('display_errors', '1');
 error_reporting(E_ALL);
 
 echo "PHP: " . PHP_VERSION . "\n";
-echo "config.php existe: " . (file_exists(__DIR__ . '/config.php') ? 'SI' : 'NO') . "\n";
+echo "config.php en public_html: " . (file_exists(__DIR__ . '/config.php') ? 'SI' : 'NO') . "\n";
+echo "config.php un nivel arriba: " . (file_exists(__DIR__ . '/../config.php') ? 'SI' : 'NO') . "\n";
 
 foreach (['db.php', 'sesion.php', 'sincronizacion.php', 'correos.php', 'camino-nucleo.php', 'login.php', 'terapeuta.php'] as $f) {
   echo "$f existe: " . (file_exists(__DIR__ . "/$f") ? 'SI' : 'NO') . "\n";
 }
 
 try {
-  require_once __DIR__ . '/config.php';
+  require_once file_exists(__DIR__ . '/../config.php') ? __DIR__ . '/../config.php' : __DIR__ . '/config.php';
   foreach (['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS', 'HUBSPOT_PRIVATE_APP_TOKEN', 'BREVO_API_KEY'] as $c) {
     echo "$c definida: " . (defined($c) && constant($c) !== '' ? 'SI' : 'NO') . "\n";
   }

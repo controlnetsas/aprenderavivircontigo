@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once file_exists(__DIR__ . '/../config.php') ? __DIR__ . '/../config.php' : __DIR__ . '/config.php';
 
 // IDs de las listas de Brevo, una por taller — reemplaza con los tuyos (Brevo → Contactos → Listas).
 $MAPA_LISTAS_BREVO = [

@@ -1,7 +1,7 @@
 <?php
 // correos.php — envío de correos transaccionales con Brevo y enlaces de WhatsApp.
 // Usa BREVO_API_KEY de config.php (la misma clave que ya usa sincronizacion.php).
-require_once __DIR__ . '/config.php';
+require_once file_exists(__DIR__ . '/../config.php') ? __DIR__ . '/../config.php' : __DIR__ . '/config.php';
 
 if (!defined('SITIO_URL')) define('SITIO_URL', 'https://aprenderavivircontigo.com');
 
