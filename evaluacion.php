@@ -101,9 +101,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 paginaInicio('Evaluación inicial');
 ?>
+<div class="hero">
+  <h1>Tu evaluación inicial</h1>
+  <p>Tu terapeuta te invita a dar el primer paso de tu proceso. Son cuatro momentos sencillos y puedes ir a tu ritmo:</p>
+  <div class="pasos">
+    <span class="paso-t"><b>Paso 1</b>Crea tu cuenta</span>
+    <span class="paso-t"><b>Paso 2</b>Confirma tu correo</span>
+    <span class="paso-t"><b>Paso 3</b>Llena tu ficha</span>
+    <span class="paso-t"><b>Paso 4</b>Haz los tests</span>
+  </div>
+</div>
 <div class="card">
-  <h1>Evaluación inicial</h1>
-  <p>Tu terapeuta te invita a crear tu cuenta. Después llenarás una ficha con tus datos básicos y harás tres tests de autoindagación (genealogía, heridas de la infancia y Reconóce TE). Con eso se genera un informe que ayuda a tu terapeuta a acompañarte.</p>
+  <h2 style="margin-top:0">Crea tu cuenta</h2>
   <?php if ($error) echo aviso('err', $error); ?>
   <form method="post" autocomplete="off">
     <input type="hidden" name="t" value="<?= h($token) ?>">

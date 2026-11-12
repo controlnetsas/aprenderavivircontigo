@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($ev['ficha_completa'] && $av['genealogia'] && $av['eneatipo'] && $av['herida']) {
       $inf = construirInformeEvaluacion($pdo, $ev, $usuario);
       $pdo->prepare("UPDATE evaluaciones SET informe = ?, estado = 'completada', completada_en = NOW() WHERE id = ?")->execute([$inf['html'], $ev['id']]);
+      try { $pdo->prepare("INSERT INTO informes_evaluacion (evaluacion_id, usuario_id, informe) VALUES (?,?,?)")->execute([$ev['id'], $usuario['id'], $inf['html']]); } catch (Throwable $e) { error_log('historial informe: ' . $e->getMessage()); }
       $t = $pdo->prepare("SELECT nombre, email FROM usuarios WHERE id = ?");
       $t->execute([$ev['terapeuta_usuario_id']]);
       if ($ter = $t->fetch(PDO::FETCH_ASSOC)) {
@@ -55,37 +56,53 @@ $av = avanceTestsEvaluacion($pdo, $usuario['id']);
 $todo = $ev['ficha_completa'] && $av['genealogia'] && $av['eneatipo'] && $av['herida'];
 $ok = fn($b) => $b ? '<span class="chip" style="background:#e4f3e6">✓ Listo</span>' : '<span class="chip">Pendiente</span>';
 
+$hechos = (int)(bool)$ev['ficha_completa'] + (int)$av['genealogia'] + (int)$av['eneatipo'] + (int)$av['herida'];
+$pct = (int)round($hechos * 25);
+$paso = fn($n, $t, $b, $href) => '<a class="paso-t' . ($b ? ' hecho' : '') . '" href="' . $href . '"><b>' . ($b ? '✓ Listo' : 'Paso ' . $n) . '</b>' . $t . '</a>';
+
 paginaInicio('Mi evaluación');
-echo '<p class="mut"><a href="/membresia.php">Mi membresía</a> · <a href="/cambiar-clave.php">Cambiar contraseña</a></p>';
-echo '<h1>Mi evaluación inicial</h1>';
-if (!empty($_GET['confirmado'])) echo aviso('ok', 'Correo confirmado. ¡Bienvenido/a!');
-echo $mensaje;
-echo '<p class="mut">Cuatro pasos: tu ficha y tres tests. Al terminar se genera un informe para tu terapeuta. Puedes ir a tu ritmo y volver cuando quieras.</p>';
 ?>
-<div class="card" style="margin-bottom:14px">
-  <h2 style="margin-top:0">1. Mi ficha <?= $ok($ev['ficha_completa']) ?></h2>
+<div class="hero">
+  <p class="mut" style="color:rgba(255,255,255,.7)"><a href="/membresia.php" style="color:#F5C343">Mi membresía</a> · <a href="/cambiar-clave.php" style="color:#F5C343">Cambiar contraseña</a></p>
+  <h1>Hola, <?= h(primerNombre($usuario['nombre'])) ?></h1>
+  <p>Esta es tu evaluación inicial: una ficha con tus datos y tres tests de autoindagación. Con ella tu terapeuta te acompaña mejor. Puedes ir a tu ritmo y volver cuando quieras: lo que guardes queda en tu historial.</p>
+  <div class="barra" style="margin-top:14px;background:rgba(255,255,255,.18)"><i style="width:<?= $pct ?>%"></i></div>
+  <p style="font-size:13px;margin:6px 0 0"><?= $hechos ?> de 4 pasos listos</p>
+  <div class="pasos">
+    <?= $paso(1, 'Mi ficha', $ev['ficha_completa'], '#ficha') ?>
+    <?= $paso(2, 'Genealogía', $av['genealogia'], '#genealogia') ?>
+    <?= $paso(3, 'Eneatipos', $av['eneatipo'], '#reconocete') ?>
+    <?= $paso(4, 'Heridas de la infancia', $av['herida'], '#reconocete') ?>
+  </div>
+</div>
+<?php if (!empty($_GET['confirmado'])) echo aviso('ok', 'Correo confirmado. ¡Bienvenido/a!'); echo $mensaje; ?>
+<div class="card" id="ficha" style="margin-bottom:16px">
+  <h2 style="margin-top:0"><span class="nbadge<?= $ev['ficha_completa'] ? ' hecho' : '' ?>">1</span>Mi ficha</h2>
+  <p class="mut">Cuéntale a tu terapeuta quién eres hoy. Lo que prefieras no compartir, déjalo en blanco (solo edad y síntomas son necesarios).</p>
   <form method="post">
     <input type="hidden" name="csrf" value="<?= h(tokenCsrf()) ?>"><input type="hidden" name="accion" value="ficha">
     <?= formularioFicha($ev) ?>
     <p><button class="btn btn-primary" type="submit">Guardar mi ficha</button></p>
   </form>
 </div>
-<div class="card" style="margin-bottom:14px">
-  <h2 style="margin-top:0">2. Test de Genealogía <?= $ok($av['genealogia']) ?></h2>
-  <p>Construyes tu árbol y recorres seis temas. Al final pulsa "Guardar mi resultado".</p>
-  <a class="btn btn-primary" href="/test-genealogia.php?eval=1"><?= $av['genealogia'] ? 'Repetir' : 'Hacer el test' ?></a>
+<div class="card" id="genealogia" style="margin-bottom:16px">
+  <h2 style="margin-top:0"><span class="nbadge<?= $av['genealogia'] ? ' hecho' : '' ?>">2</span>Test de Genealogía</h2>
+  <p>Construyes tu árbol familiar y recorres seis temas. Toma unos 20 a 30 minutos. Al final pulsa "Guardar mi resultado" para volver aquí.</p>
+  <a class="btn btn-primary" href="/test-genealogia.php?eval=1"><?= $av['genealogia'] ? 'Repetir el test' : 'Hacer el test' ?></a>
 </div>
-<div class="card" style="margin-bottom:14px">
-  <h2 style="margin-top:0">3. Test Reconóce TE — Eneatipos <?= $ok($av['eneatipo']) ?></h2>
-  <h2 style="margin-top:10px">4. Test Reconóce TE — Heridas de la infancia <?= $ok($av['herida']) ?></h2>
-  <p>Son dos partes en la misma página. En cada una, al terminar, pulsa "Guardar mi resultado".</p>
-  <a class="btn btn-primary" href="/test-reconocete.php?eval=1"><?= ($av['eneatipo'] && $av['herida']) ? 'Repetir' : 'Hacer el test' ?></a>
+<div class="card" id="reconocete" style="margin-bottom:16px">
+  <h2 style="margin-top:0"><span class="nbadge<?= ($av['eneatipo'] && $av['herida']) ? ' hecho' : '' ?>">3-4</span>Reconóce TE</h2>
+  <p>Dos partes en la misma página: tu <strong>eneatipo</strong> <?= $ok($av['eneatipo']) ?> y tus <strong>heridas de la infancia</strong> <?= $ok($av['herida']) ?>. En cada una, al terminar, pulsa "Guardar mi resultado".</p>
+  <a class="btn btn-primary" href="/test-reconocete.php?eval=1"><?= ($av['eneatipo'] && $av['herida']) ? 'Repetir los tests' : 'Hacer los tests' ?></a>
 </div>
-<div class="card">
-  <h2 style="margin-top:0">Generar mi informe</h2>
+<div class="card" style="border:2px solid <?= $todo ? '#F5C343' : '#eadfc9' ?>">
+  <h2 style="margin-top:0"><span class="nbadge<?= $ev['estado'] === 'completada' ? ' hecho' : '' ?>">✓</span>Enviar mi informe</h2>
   <?php if ($ev['estado'] === 'completada'): ?>
-    <p>Tu informe se envió el <?= h(fechaCorta(substr((string)$ev['completada_en'], 0, 10))) ?>. Si cambiaste algo, puedes generarlo de nuevo.</p>
-    <p><a class="btn btn-outline-dark" target="_blank" rel="noopener" href="https://wa.me/<?= h(WHATSAPP_AVC) ?>?text=<?= rawurlencode('Hola Carlos, terminé mi evaluación inicial. Soy ' . $usuario['nombre'] . '. Informe: ' . SITIO_URL . '/informe.php?id=' . (int)$ev['id']) ?>">Avisar a mi terapeuta por WhatsApp</a></p>
+    <p>Tu informe se envió el <?= h(fechaCorta(substr((string)$ev['completada_en'], 0, 10))) ?>. Si cambias algo (por ejemplo, para una nueva consulta), puedes generarlo de nuevo: tu historial se conserva.</p>
+    <p><a class="btn btn-outline-dark" target="_blank" rel="noopener" href="https://wa.me/<?= h(WHATSAPP_AVC) ?>?text=<?= rawurlencode('Hola Carlos, terminé mi evaluación inicial. Soy ' . $usuario['nombre'] . '. Informe: ' . SITIO_URL . '/informe.php?id=' . (int)$ev['id']) ?>">Avisar a mi terapeuta por WhatsApp</a>
+       <a class="btn btn-outline-dark" href="/informe.php?id=<?= (int)$ev['id'] ?>">Ver mi informe</a></p>
+  <?php else: ?>
+    <p>Cuando completes los cuatro pasos, se genera tu informe y le llega a tu terapeuta por correo.</p>
   <?php endif; ?>
   <?php if ($todo): ?>
     <form method="post"><input type="hidden" name="csrf" value="<?= h(tokenCsrf()) ?>"><input type="hidden" name="accion" value="finalizar">

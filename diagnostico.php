@@ -18,3 +18,36 @@ foreach (['db.php', 'correos.php', 'sincronizacion.php', 'sesion.php', 'camino-n
 }
 echo "\nSMTP configurado: " . (defined('SMTP_USER') && SMTP_USER ? 'SI' : 'NO') . "\n";
 echo "Fin. Borra este archivo del servidor.\n";
+
+// ---- Prueba de envío (solo si se pide): diagnostico.php?k=avc2026&enviar=correo@ejemplo.com ----
+if (!empty($_GET['enviar']) && filter_var($_GET['enviar'], FILTER_VALIDATE_EMAIL)) {
+  $dest = $_GET['enviar'];
+  echo "\n=== PRUEBA SMTP hacia $dest ===\n";
+  $host = defined('SMTP_HOST') ? SMTP_HOST : 'smtp.hostinger.com';
+  $puerto = defined('SMTP_PORT') ? (int)SMTP_PORT : 465;
+  echo "Conectando a $host:$puerto ...\n";
+  $f = @stream_socket_client('ssl://' . $host . ':' . $puerto, $en, $es, 15);
+  if (!$f) { echo "NO CONECTA: $es ($en)\n"; }
+  else {
+    stream_set_timeout($f, 15);
+    $leer = function () use ($f) { $r = ''; while (($l = fgets($f, 515)) !== false) { $r .= $l; if (strlen($l) < 4 || $l[3] === ' ') break; } return trim($r); };
+    $paso = function ($txt, $c, $oculto = false) use ($f, $leer) {
+      if ($c !== null) fwrite($f, $c . "\r\n");
+      $r = $leer(); echo ($txt ? "[$txt] " : '') . $r . "\n"; return $r;
+    };
+    $paso('saludo', null);
+    $paso('EHLO', 'EHLO aprenderavivircontigo.com');
+    $paso('AUTH', 'AUTH LOGIN');
+    $paso('usuario', base64_encode(SMTP_USER));
+    $r = $paso('clave', base64_encode(SMTP_PASS));
+    if (strpos($r, '235') === 0) {
+      $paso('MAIL FROM', 'MAIL FROM:<' . SMTP_USER . '>');
+      $paso('RCPT TO', 'RCPT TO:<' . $dest . '>');
+      $paso('DATA', 'DATA');
+      $msg = "From: Aprender a Vivir Contigo <" . SMTP_USER . ">\r\nTo: <$dest>\r\nSubject: Prueba de correo\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nSi lees esto, el envio funciona.\r\n.\r\n";
+      fwrite($f, $msg); echo "[envio] " . $leer() . "\n";
+    } else echo "LA AUTENTICACION FALLO: revisa SMTP_USER y SMTP_PASS en config.php\n";
+    fwrite($f, "QUIT\r\n"); fclose($f);
+  }
+  echo "\nmail() nativo: " . (function_exists('mail') ? 'disponible' : 'NO disponible') . "\n";
+}
