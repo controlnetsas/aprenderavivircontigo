@@ -92,7 +92,7 @@ foreach ($contenido as $item) { $agrupado[$item['tipo']][] = $item; }
   <a class="btn btn-outline-dark" href="/mis-tests.php">Mis tests</a>
   <a class="btn btn-outline-dark" href="/cambiar-clave.php">Cambiar contraseña</a>
   <?php if (!empty($usuario) && ($usuario['rol'] ?? '') === 'terapeuta'): ?>
-    <a class="btn btn-primary" href="/terapeuta.php">Panel del terapeuta</a>
+    <a class="btn btn-primary" href="/portal-terapeuta.php">Portal del terapeuta</a>
   <?php endif; ?>
 </div>
 

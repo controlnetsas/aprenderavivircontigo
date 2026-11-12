@@ -3,6 +3,7 @@
 // Si llega el código `t` de un enlace activo, además de la cuenta crea la evaluación inicial de la persona.
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/sincronizacion.php';
+require_once __DIR__ . '/enlaces-evaluacion.php';
 
 $origen = ($_POST['origen'] ?? '') === 'bienvenida';
 $tokenEnlace = $_POST['t'] ?? '';
@@ -28,11 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Registro desde un enlace del terapeuta: el enlace debe estar activo y los datos deben estar completos.
   $enlace = null;
   if ($tokenEnlace) {
-    try {
-      $s = $pdo->prepare("SELECT * FROM enlaces_evaluacion WHERE token = ? AND activo = 1");
-      $s->execute([$tokenEnlace]);
-      $enlace = $s->fetch(PDO::FETCH_ASSOC) ?: null;
-    } catch (Throwable $e) { $enlace = null; }
+    $enlace = enlaceVigente($pdo, $tokenEnlace);
     if (!$enlace) irError($volver, 'enlace');
     $digitos = preg_replace('/\D+/', '', $telefono);
     if (mb_strlen($nombre) < 5 || mb_strpos($nombre, ' ') === false || strlen($digitos) < 10 || strlen($digitos) > 15 || empty($_POST['consentimiento'])) {
@@ -56,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       )->execute([$nombre, $email, $telefono, $hash, $token]);
       $uid = (int)$pdo->lastInsertId();
       if ($enlace) {
+        if (!consumirEnlace($pdo, $enlace['id'])) throw new RuntimeException('enlace agotado');
         $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
             ->execute([$uid, $enlace['terapeuta_usuario_id'], $enlace['id']]);
       }
@@ -63,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Throwable $e) {
       if ($pdo->inTransaction()) $pdo->rollBack();
       error_log('registro-cuenta.php: ' . $e->getMessage());
-      irError($volver, '1');
+      irError($volver, $e->getMessage() === 'enlace agotado' ? 'enlace' : '1');
     }
 
     try {

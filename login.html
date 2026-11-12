@@ -120,7 +120,7 @@
   (function () {
     var params = new URLSearchParams(window.location.search);
     var nx = params.get('next');
-    if (nx && /^\/evaluacion\.php\?t=[a-f0-9]{64}$/.test(nx)) document.getElementById('login-next').value = nx;
+    if (nx && (/^\/evaluacion\.php\?t=[a-f0-9]{64}$/.test(nx) || nx === '/portal-terapeuta.php')) document.getElementById('login-next').value = nx;
     var error = params.get('error');
     if (!error) return;
 

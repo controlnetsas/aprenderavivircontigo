@@ -6,7 +6,17 @@ require_once __DIR__ . '/camino-nucleo.php';
 $token = $_GET['t'] ?? '';
 $tokenOk = is_string($token) && preg_match('/^[a-f0-9]{64}$/', $token);
 $destino = $tokenOk ? '/evaluacion.php?t=' . $token : '';
+// Si el enlace del terapeuta ya venció, se agotó o fue desactivado, no se ofrece el registro con él.
+$enlaceMuerto = false;
+if ($tokenOk) {
+  try {
+    require_once __DIR__ . '/enlaces-evaluacion.php';
+    $enlaceMuerto = enlaceVigente(conexionDB(), $token) === null;
+  } catch (Throwable $e) { $enlaceMuerto = false; }
+}
+if ($enlaceMuerto) { $destino = ''; $token = ''; $tokenOk = false; }
 $err = $_GET['error'] ?? '';
+if ($enlaceMuerto && !$err) $err = 'enlace';
 $wa = 'https://wa.me/' . WHATSAPP_AVC . '?text=' . rawurlencode('Hola Carlos, tengo una duda sobre mi proceso.');
 
 paginaInicio('Bienvenida a tu proceso');

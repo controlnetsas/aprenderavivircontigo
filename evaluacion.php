@@ -3,17 +3,13 @@
 require_once __DIR__ . '/sesion.php';
 require_once __DIR__ . '/camino-nucleo.php';
 require_once __DIR__ . '/sincronizacion.php';
+require_once __DIR__ . '/enlaces-evaluacion.php';
 
 $pdo = conexionDB();
 $token = $_GET['t'] ?? ($_POST['t'] ?? '');
 $error = '';
 
-$enlace = null;
-if (is_string($token) && preg_match('/^[a-f0-9]{64}$/', $token)) {
-  $s = $pdo->prepare("SELECT * FROM enlaces_evaluacion WHERE token = ? AND activo = 1");
-  $s->execute([$token]);
-  $enlace = $s->fetch(PDO::FETCH_ASSOC) ?: null;
-}
+$enlace = enlaceVigente($pdo, $token); // activo, sin vencer y con usos disponibles
 if (!$enlace) {
   paginaInicio('Enlace no válido');
   echo '<div class="card"><h1>Este enlace ya no es válido</h1><p>Pídele a tu terapeuta un enlace nuevo.</p>'
@@ -27,8 +23,10 @@ $usuario = usuarioActual();
 if ($usuario) {
   if (!evaluacionDeUsuario($pdo, $usuario['id']) && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['comenzar'])) {
     verificaCsrf();
-    $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
-        ->execute([$usuario['id'], $enlace['terapeuta_usuario_id'], $enlace['id']]);
+    if (consumirEnlace($pdo, $enlace['id'])) {
+      $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
+          ->execute([$usuario['id'], $enlace['terapeuta_usuario_id'], $enlace['id']]);
+    }
   }
   if (evaluacionDeUsuario($pdo, $usuario['id'])) { header('Location: /mi-evaluacion.php'); exit; }
   paginaInicio('Evaluación inicial');
@@ -77,13 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("INSERT INTO usuarios (nombre, email, telefono, password_hash, estado_membresia, email_verificado, token_verificacion) VALUES (?,?,?,?, 'pendiente', 0, ?)")
             ->execute([$nombre, $email, $celular, password_hash($password, PASSWORD_DEFAULT), $tokenVer]);
         $uid = (int)$pdo->lastInsertId();
+        if (!consumirEnlace($pdo, $enlace['id'])) throw new RuntimeException('enlace agotado');
         $pdo->prepare("INSERT INTO evaluaciones (usuario_id, terapeuta_usuario_id, enlace_id, consentimiento_en) VALUES (?,?,?,NOW())")
             ->execute([$uid, $enlace['terapeuta_usuario_id'], $enlace['id']]);
         $pdo->commit();
       } catch (Throwable $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         error_log('evaluacion.php: ' . $e->getMessage());
-        $error = 'No pudimos crear tu cuenta. Intenta de nuevo o escríbenos por WhatsApp.';
+        $error = $e->getMessage() === 'enlace agotado' ? 'Este enlace ya fue usado o venció. Pídele uno nuevo a tu terapeuta.' : 'No pudimos crear tu cuenta. Intenta de nuevo o escríbenos por WhatsApp.';
         $uid = 0;
       }
       if (!$error && $uid) {
