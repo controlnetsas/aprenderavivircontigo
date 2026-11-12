@@ -74,3 +74,37 @@ function crearEvaluacion($pdo, $usuarioId, $enlace) {
         ->execute([$usuarioId, $enlace['terapeuta_usuario_id'], $enlace['id']]);
   }
 }
+
+/** Deja la base de datos lista sola: agrega las columnas que falten (reemplaza correr SQL en phpMyAdmin). Seguro de repetir. */
+function prepararBaseEvaluaciones(PDO $pdo): void {
+  try {
+    $falta = function (string $tabla, string $col) use ($pdo): bool {
+      $q = $pdo->prepare("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?");
+      $q->execute([$tabla, $col]);
+      return (int)$q->fetchColumn() === 0;
+    };
+    $nuevoExpira = $falta('enlaces_evaluacion', 'expira_en');
+    $cols = [
+      'enlaces_evaluacion' => [
+        'nombre_destino'  => 'VARCHAR(150) NULL',
+        'correo_destino'  => 'VARCHAR(190) NULL',
+        'celular_destino' => 'VARCHAR(30) NULL',
+        'expira_en'       => 'DATETIME NULL',
+        'usos_max'        => 'INT NOT NULL DEFAULT 1',
+        'usos'            => 'INT NOT NULL DEFAULT 0',
+        'tests'           => "VARCHAR(100) NOT NULL DEFAULT 'genealogia,eneatipo,herida'",
+      ],
+      'evaluaciones' => [
+        'tests'           => "VARCHAR(100) NOT NULL DEFAULT 'genealogia,eneatipo,herida'",
+      ],
+    ];
+    foreach ($cols as $tabla => $lista) {
+      foreach ($lista as $col => $def) {
+        if ($falta($tabla, $col)) $pdo->exec("ALTER TABLE `$tabla` ADD COLUMN `$col` $def");
+      }
+    }
+    if ($nuevoExpira) { // enlaces antiguos sin fecha: pasan a vencer en 7 días
+      $pdo->exec("UPDATE enlaces_evaluacion SET expira_en = DATE_ADD(NOW(), INTERVAL 7 DAY), usos_max = 50 WHERE activo = 1 AND expira_en IS NULL");
+    }
+  } catch (Throwable $e) { error_log('prepararBaseEvaluaciones: ' . $e->getMessage()); }
+}

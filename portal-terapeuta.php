@@ -15,6 +15,7 @@ if (!$terapeuta || ($terapeuta['rol'] ?? '') !== 'terapeuta') {
   paginaFin(); exit;
 }
 $pdo = conexionDB();
+prepararBaseEvaluaciones($pdo); // agrega solo las columnas nuevas (sin phpMyAdmin)
 $tid = (int)$terapeuta['id'];
 
 $VIGENCIAS = ['+24 hours' => '24 horas', '+3 days' => '3 días', '+7 days' => '7 días', '+30 days' => '30 días'];
