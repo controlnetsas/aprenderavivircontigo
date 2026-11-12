@@ -6,6 +6,7 @@ require_once __DIR__ . '/camino-nucleo.php';
 $token = $_GET['t'] ?? '';
 $tokenOk = is_string($token) && preg_match('/^[a-f0-9]{64}$/', $token);
 $destino = $tokenOk ? '/evaluacion.php?t=' . $token : '';
+$err = $_GET['error'] ?? '';
 $wa = 'https://wa.me/' . WHATSAPP_AVC . '?text=' . rawurlencode('Hola Carlos, tengo una duda sobre mi proceso.');
 
 paginaInicio('Bienvenida a tu proceso');
@@ -97,8 +98,15 @@ paginaInicio('Bienvenida a tu proceso');
 <div class="bv bv-reg" id="registro">
   <h2>Regístrate para iniciar el camino de Aprender a Vivir Contigo</h2>
   <p style="font-size:18px">Crea tu cuenta. Te toma un par de minutos.</p>
+  <?php if ($err): ?>
+  <div style="background:#fde8e8;color:#8a1f1f;border-radius:14px;padding:14px 18px;max-width:560px;margin:14px auto 0;text-align:left;font-size:16px">
+    <?php if ($err === 'correo-existente'): ?>Ese correo <strong>ya tiene una cuenta</strong>. <a href="/login.html" style="color:#8a1f1f;font-weight:700;text-decoration:underline">Inicia sesión aquí</a> o <a href="/olvide-clave.php" style="color:#8a1f1f;text-decoration:underline">recupera tu contraseña</a>.
+    <?php elseif ($err === 'clave'): ?>Las contraseñas no coinciden. Vuelve a escribirlas.
+    <?php else: ?>No pudimos crear tu cuenta. Revisa tus datos e inténtalo de nuevo.<?php endif; ?>
+  </div>
+  <?php endif; ?>
   <form class="bv-form" method="post" action="<?= $destino ? '/evaluacion.php' : '/registro-cuenta.php' ?>" autocomplete="off">
-    <?php if ($destino): ?><input type="hidden" name="t" value="<?= h($token) ?>"><?php endif; ?>
+    <?php if ($destino): ?><input type="hidden" name="t" value="<?= h($token) ?>"><?php else: ?><input type="hidden" name="origen" value="bienvenida"><?php endif; ?>
     <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="sitio_web" tabindex="-1" autocomplete="off"></div>
     <label class="etq" for="b-nombre">Nombre completo*</label>
     <input class="campo" id="b-nombre" name="nombre" required maxlength="150">

@@ -2,6 +2,9 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/sincronizacion.php';
 
+$volver = (($_POST['origen'] ?? '') === 'bienvenida') ? '/bienvenida.php?error=%s#registro' : '/registrate.html?error=%s';
+function irError($plantilla, $codigo) { header('Location: ' . sprintf($plantilla, $codigo)); exit; }
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $nombre = trim($_POST['nombre'] ?? '');
   $email = trim($_POST['correo'] ?? '');
@@ -12,8 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!empty($_POST['sitio_web'] ?? '')) exit; // campo trampa anti-spam
 
   if ($password !== $password2) {
-    header('Location: /registrate.html?error=clave');
-    exit;
+    irError($volver, 'clave');
   }
 
   if ($nombre && filter_var($email, FILTER_VALIDATE_EMAIL) && strlen($password) >= 8) {
@@ -25,8 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($usuarioExistente) {
       // Ya existe una cuenta con ese correo — lo mandamos a iniciar sesión en vez de duplicarla.
-      header('Location: /registrate.html?error=correo-existente');
-      exit;
+      irError($volver, 'correo-existente');
     }
 
     $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -48,5 +49,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 }
-header('Location: /registrate.html?error=1');
-exit;
+irError($volver, '1');
