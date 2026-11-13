@@ -25,7 +25,7 @@ if ($codigoReal !== '' && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acci
 
 if ($codigoReal !== '' && $abierta && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'registro') {
   verificaCsrf();
-  if (!empty($_POST['sitio_web'] ?? '')) exit; // campo trampa anti-spam
+  if (!empty($_POST['cp_extra'] ?? '')) exit; // campo trampa anti-spam
   $v['nombre']  = trim($_POST['nombre'] ?? '');
   $v['correo']  = trim($_POST['correo'] ?? '');
   $v['celular'] = trim($_POST['celular'] ?? '');
@@ -121,7 +121,7 @@ paginaInicio('Registro de terapeuta');
   <form method="post" autocomplete="on">
     <input type="hidden" name="csrf" value="<?= h(tokenCsrf()) ?>">
     <input type="hidden" name="accion" value="registro">
-    <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="sitio_web" tabindex="-1" autocomplete="off"></div>
+    <div style="position:absolute;left:-9999px" aria-hidden="true"><input type="text" name="cp_extra" tabindex="-1" autocomplete="off"></div>
 
     <label class="etq" for="t-correo" style="margin-top:0">Correo*</label>
     <input class="campo" id="t-correo" type="email" name="correo" required value="<?= h($v['correo']) ?>" autocomplete="email">

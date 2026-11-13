@@ -120,7 +120,7 @@ paginaInicio('Bienvenida a tu proceso');
   <?php endif; ?>
   <form class="bv-form" method="post" action="/registro-cuenta.php" autocomplete="off">
     <input type="hidden" name="origen" value="bienvenida"><?php if ($destino): ?><input type="hidden" name="t" value="<?= h($token) ?>"><?php endif; ?>
-    <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="sitio_web" tabindex="-1" autocomplete="off"></div>
+    <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="cp_extra" tabindex="-1" autocomplete="off"></div>
     <label class="etq" for="b-nombre">Nombre completo*</label>
     <input class="campo" id="b-nombre" name="nombre" required maxlength="150">
     <div class="g2">

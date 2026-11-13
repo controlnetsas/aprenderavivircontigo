@@ -40,7 +40,7 @@ if ($usuario) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if (!empty($_POST['sitio_web'] ?? '')) exit; // campo trampa
+  if (!empty($_POST['cp_extra'] ?? '')) exit; // campo trampa
   $nombre = trim($_POST['nombre'] ?? '');
   $email = trim($_POST['correo'] ?? '');
   $celular = trim($_POST['celular'] ?? '');
@@ -115,7 +115,7 @@ paginaInicio('Evaluación inicial');
   <?php if ($error) echo aviso('err', $error); ?>
   <form method="post" autocomplete="off">
     <input type="hidden" name="t" value="<?= h($token) ?>">
-    <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="sitio_web" tabindex="-1" autocomplete="off"></div>
+    <div style="position:absolute;left:-9999px" aria-hidden="true"><input name="cp_extra" tabindex="-1" autocomplete="off"></div>
     <label class="etq" for="nombre">Nombre completo</label>
     <input class="campo" id="nombre" name="nombre" required maxlength="150" value="<?= h($_POST['nombre'] ?? '') ?>">
     <label class="etq" for="correo">Correo electrónico</label>

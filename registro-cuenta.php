@@ -12,6 +12,8 @@ $volver = $origen
   ? '/bienvenida.php?error=%s' . ($tokenEnlace ? '&t=' . $tokenEnlace : '') . '#registro'
   : '/registrate.html?error=%s';
 function irError($plantilla, $codigo) { header('Location: ' . sprintf($plantilla, $codigo)); exit; }
+// Si algo falla de forma inesperada, nunca se deja la pantalla en blanco: se vuelve al formulario con un aviso.
+set_exception_handler(function ($e) use ($volver) { error_log('registro-cuenta.php: ' . $e->getMessage()); irError($volver, '1'); });
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $nombre = trim($_POST['nombre'] ?? '');
@@ -20,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password = $_POST['password'] ?? '';
   $password2 = $_POST['password2'] ?? '';
 
-  if (!empty($_POST['sitio_web'] ?? '')) exit; // campo trampa anti-spam
+  if (!empty($_POST['cp_extra'] ?? '')) irError($volver, '1'); // campo trampa anti-spam
 
   if ($password !== $password2) irError($volver, 'clave');
 
@@ -69,7 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       sincronizarContactoBrevo($nombre, $email, $telefono, $enlace ? 'Evaluación inicial' : 'Boletín general');
     } catch (Throwable $e) { error_log('sync: ' . $e->getMessage()); }
 
-    enviarCorreoConfirmacion($nombre, $email, SITIO_URL . '/confirmar-correo.php?token=' . $token);
+    try { enviarCorreoConfirmacion($nombre, $email, SITIO_URL . '/confirmar-correo.php?token=' . $token); }
+    catch (Throwable $e) { error_log('correo confirmación: ' . $e->getMessage()); }
 
     header('Location: /revisa-tu-correo.html?correo=' . urlencode($email));
     exit;
