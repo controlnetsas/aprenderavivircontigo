@@ -38,7 +38,11 @@
         var idNota = id + '-nota';
         return (
           '<div class="reco-pregunta">' +
-            '<p class="reco-texto">' + p + '</p>' +
+            '<div class="avc-fila">' +
+              (window.AVC_AYUDA ? window.AVC_AYUDA.icono(id, 30) : '') +
+              '<div class="avc-fila-texto"><p class="reco-texto">' + p + '</p>' +
+              (window.AVC_AYUDA ? window.AVC_AYUDA.ejemplo(id) : '') + '</div>' +
+            '</div>' +
             opcionesHtml(id) +
             '<div class="genea-pregunta" style="margin-top:10px;">' +
               '<label for="' + idNota + '">Aclaración o detalle (opcional) — nombres, fechas, lo que quieras recordar</label>' +

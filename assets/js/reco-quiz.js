@@ -114,8 +114,10 @@
         '</div>' +
         '<p class="reco-quiz-progreso-nota">Las preguntas van cambiando de tema al azar en cada paso, así que no hay un orden que puedas anticipar.</p>' +
         '<div class="reco-quiz-pregunta">' +
+          (window.AVC_AYUDA ? window.AVC_AYUDA.icono(item.id, 44) + '<br>' : '') +
           '<span class="reco-quiz-numero">' + (indice + 1) + '</span>' +
           '<p>' + item.pregunta + '</p>' +
+          (window.AVC_AYUDA ? window.AVC_AYUDA.ejemplo(item.id) : '') +
           '<div class="reco-opciones" role="radiogroup">' +
             ['Sí', 'No', 'No me identifico'].map(function (op) {
               var activa = elegido === op ? ' reco-opcion-activa' : '';
